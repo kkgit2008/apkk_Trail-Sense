@@ -28,7 +28,23 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build
-        run: ./gradlew assembleDebug
+        run: ./gradlew assembleDebug assembleRelease
 
       - name: Run unit tests
-        run: ./gradlew testDebugUnitTest
+        run: ./gradlew testDebugUnitTest testReleaseUnitTest
+
+      - name: Generate SHA256 checksums
+        run: |
+          find . -name '*.apk' | while read apk; do
+            sha256sum "$apk" > "${apk}.sha256"
+          done
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: myapk
+          path: |
+            app/build/outputs/apk/debug/*.apk
+            app/build/outputs/apk/debug/*.sha256
+            app/build/outputs/apk/release/*.apk
+            app/build/outputs/apk/release/*.sha256
