@@ -7,9 +7,6 @@ on:
   pull_request:
     branches:
       - main
-env:
-  # Misc
-  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   build:
