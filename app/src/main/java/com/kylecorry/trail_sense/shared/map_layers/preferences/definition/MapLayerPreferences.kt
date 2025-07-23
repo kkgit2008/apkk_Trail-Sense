@@ -40,7 +40,7 @@ data class MapLayerPreferences(
             )
         }
 
-        fun photoMaps(context: Context, enabledByDefault: Boolean = true): MapLayerPreferences {
+        fun photoMaps(context: Context, enabledByDefault: Boolean = true, defaultOpacity: Int = 50): MapLayerPreferences {
             return MapLayerPreferences(
                 "map_layer", context.getString(R.string.photo_maps), listOf(
                     SwitchMapLayerPreference(
@@ -51,9 +51,16 @@ data class MapLayerPreferences(
                     SeekbarMapLayerPreference(
                         context.getString(R.string.opacity),
                         "map_layer_opacity",
-                        defaultValue = 50,
+                        defaultValue = defaultOpacity,
                         dependency = "map_layer_enabled"
-                    )
+                    ),
+                    SwitchMapLayerPreference(
+                        context.getString(R.string.load_pdf_tiles),
+                        "map_layer_load_pdfs",
+                        defaultValue = false,
+                        dependency = "map_layer_enabled",
+                        summary = context.getString(R.string.load_pdf_tiles_summary)
+                    ),
                 )
             )
         }
