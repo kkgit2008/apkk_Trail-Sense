@@ -6,7 +6,7 @@ on:
 
 env:
     # Signing INFO
-    DEV_STORE_FILE: ./debug.keystore
+    DEV_STORE_FILE: ../debug.keystore
     DEV_STORE_PASSWORD: android
     DEV_KEY_ALIAS: androiddebugkey
     DEV_KEY_PASSWORD: android
