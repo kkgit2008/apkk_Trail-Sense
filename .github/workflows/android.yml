@@ -13,6 +13,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Cancel previous runs
+        uses: styfle/cancel-workflow-action@0.12.1
+        with:
+          access_token: ${{ github.token }}
+
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
@@ -28,7 +33,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Increase Gradle memory
-        run: echo "org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g" >> gradle.properties
+        run: echo "\norg.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g\n" >> gradle.properties
 
       - name: Build Debug
         run: ./gradlew assembleDebug

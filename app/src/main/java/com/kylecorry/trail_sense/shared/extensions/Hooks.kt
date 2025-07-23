@@ -3,6 +3,10 @@ package com.kylecorry.trail_sense.shared.extensions
 import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.kylecorry.andromeda.core.sensors.IAltimeter
@@ -88,7 +92,8 @@ data class NavigationSensorValues(
     val elevation: Float,
     val elevationAccuracy: Float?,
     val bearing: Bearing,
-    val declination: Float
+    val declination: Float,
+    val speed: Speed
 )
 
 fun AndromedaFragment.useNavigationSensors(
@@ -105,8 +110,11 @@ fun AndromedaFragment.useNavigationSensors(
     val declination = useMemo(gps.location) { declinationProvider.getDeclination() }
     useEffect(compass, declination) { compass.declination = if (trueNorth) declination else 0f }
 
-    val (location, locationAccuracy) = useTopic(gps, gps.location to gps.horizontalAccuracy) {
-        gps.location to gps.horizontalAccuracy
+    val (location, locationAccuracy, speed) = useTopic(
+        gps,
+        Triple(gps.location, gps.horizontalAccuracy, gps.speed)
+    ) {
+        Triple(gps.location, gps.horizontalAccuracy, gps.speed)
     }
 
     val (elevation, elevationAccuracy) = useTopic(
@@ -126,7 +134,8 @@ fun AndromedaFragment.useNavigationSensors(
         elevation,
         elevationAccuracy,
         bearing,
-        declination
+        declination,
+        speed
     ) {
         NavigationSensorValues(
             location,
@@ -134,7 +143,8 @@ fun AndromedaFragment.useNavigationSensors(
             elevation,
             elevationAccuracy,
             bearing,
-            declination
+            declination,
+            speed
         )
     }
 }
@@ -362,4 +372,37 @@ fun <T : View> ReactiveComponent.useViewWithCleanup(
         }
     }
     return view
+}
+
+fun ReactiveComponent.useLifecycleEffect(
+    lifecycleEvent: Lifecycle.Event,
+    vararg values: Any?,
+    action: () -> Unit
+) {
+    val owner = useLifecycleOwner()
+    val (lastObserver, setLastObserver) = useState<LifecycleObserver?>(null)
+    val observer = useMemo(*values, lifecycleEvent) {
+        LifecycleEventObserver { source: LifecycleOwner, event: Lifecycle.Event ->
+            if (event == lifecycleEvent) {
+                action()
+            }
+        }
+    }
+
+    useEffect(owner, observer) {
+        setLastObserver(observer)
+        lastObserver?.let {
+            owner.lifecycle.removeObserver(it)
+        }
+        owner.lifecycle.addObserver(observer)
+    }
+}
+
+fun ReactiveComponent.useDestroyEffect(vararg values: Any?, action: () -> Unit) {
+    useLifecycleEffect(
+        Lifecycle.Event.ON_DESTROY,
+        *values
+    ) {
+        action()
+    }
 }
