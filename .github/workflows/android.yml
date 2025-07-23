@@ -28,7 +28,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Increase Gradle memory
-        run: echo "org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g" >> gradle.properties
+        run: echo "\norg.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g\n" >> gradle.properties
 
       - name: Build Debug
         run: ./gradlew assembleDebug
