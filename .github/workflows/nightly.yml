@@ -33,9 +33,9 @@ jobs:
         run: |
           ./gradlew assembleNightly -Dnightly_store_file="${NIGHTLY_STORE_FILE}" -Dnightly_store_password="${NIGHTLY_STORE_PASSWORD}" -Dnightly_key_alias="${NIGHTLY_KEY_ALIAS}" -Dnightly_key_password="${NIGHTLY_STORE_PASSWORD}"
         env:
-          NIGHTLY_STORE_PASSWORD:android
-          NIGHTLY_KEY_ALIAS:androiddebugkey
-          NIGHTLY_STORE_FILE:../debug.keystore
+          NIGHTLY_STORE_PASSWORD: android
+          NIGHTLY_KEY_ALIAS: androiddebugkey
+          NIGHTLY_STORE_FILE: ../debug.keystore
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
