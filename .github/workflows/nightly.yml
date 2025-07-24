@@ -37,7 +37,6 @@ jobs:
 
       - name: Build APK
         run: |
-          # echo ${NIGHTLY_STORE_FILE} | base64 -d > ${NIGHTLY_STORE_FILE}
           echo ${NIGHTLY_STORE_FILE} | base64 -d > debug.keystore
           NIGHTLY_KEY_ALIAS=$(echo -n $NIGHTLY_KEY_ALIAS | base64 -d)
           ./gradlew assembleNightly -Dnightly_store_file=${NIGHTLY_STORE_FILE} -DNIGHTLY_PASSWORD="${NIGHTLY_PASSWORD}" -Dnightly_key_alias="${NIGHTLY_KEY_ALIAS}" -Dnightly_key_password="${NIGHTLY_PASSWORD}"
