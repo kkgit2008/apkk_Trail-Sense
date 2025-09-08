@@ -30,7 +30,22 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      - name: Build APK
+      - name: Build GitHub release APK
+        run: |
+          ./gradlew assembleGithub \
+            -Ddev_store_file=${{ env.DEV_STORE_FILE }} \
+            -Ddev_store_password="${{ env.DEV_STORE_PASSWORD }}" \
+            -Ddev_key_alias="${{ env.DEV_KEY_ALIAS }}" \
+            -Ddev_key_password="${{ env.DEV_KEY_PASSWORD }}"
+
+      - name: Upload GitHub release APK to release
+        uses: Shopify/upload-to-release@v2.0.0
+        with:
+          name: Trail-Sense-${{ github.event.release.tag_name }}-release.apk
+          path: ./app/build/outputs/apk/github/app-github.apk
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build legacy debug APK
         run: |
           ./gradlew assembleDev \
             -Ddev_store_file=${{ env.DEV_STORE_FILE }} \
@@ -45,17 +60,17 @@ jobs:
           path: ./app/build/outputs/apk/dev/app-dev.apk
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build GitHub Release APK
+      - name: Build legacy GitHub release APK
         run: |
-          ./gradlew assembleGithub \
+          ./gradlew assembleLegacyGithub \
             -Ddev_store_file=${{ env.DEV_STORE_FILE }} \
             -Ddev_store_password="${{ env.DEV_STORE_PASSWORD }}" \
             -Ddev_key_alias="${{ env.DEV_KEY_ALIAS }}" \
             -Ddev_key_password="${{ env.DEV_KEY_PASSWORD }}"
 
-      - name: Upload GitHub release APK to release
+      - name: Upload legacy GitHub release APK to release
         uses: Shopify/upload-to-release@v2.0.0
         with:
           name: Trail-Sense-${{ github.event.release.tag_name }}-github-release.apk
-          path: ./app/build/outputs/apk/github/app-github.apk
+          path: ./app/build/outputs/apk/legacyGithub/app-legacyGithub.apk
           repo-token: ${{ secrets.GITHUB_TOKEN }}
