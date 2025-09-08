@@ -2,17 +2,20 @@ name: Android CI
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+  # pull_request:
+
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Cancel previous runs
+        uses: styfle/cancel-workflow-action@0.12.1
+        with:
+          access_token: ${{ github.token }}
+
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
@@ -27,8 +30,39 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      - name: Build
-        run: ./gradlew assembleDebug
+      - name: Set Gradle memory (support existing/missing config)
+        run: |
+          if grep -q "^org.gradle.jvmargs=" gradle.properties; then
+            # 存在则替换原有配置
+            sed -i 's/^org.gradle.jvmargs=.*/org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g/' gradle.properties
+          else
+            # 不存在则在文件末尾安全新增（加换行避免拼接）
+            echo -e "\norg.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g" >> gradle.properties
+          fi
+          # 输出修改后的文件内容到日志
+          echo "=== Modified gradle.properties content ==="
+          cat gradle.properties
 
-      - name: Run unit tests
+      - name: Build Release
+        run: ./gradlew assembleRelease
+
+      - name: Run Debug unit tests
         run: ./gradlew testDebugUnitTest
+
+      - name: Run Release unit tests
+        run: ./gradlew testReleaseUnitTest
+
+      - name: Generate SHA256 checksums
+        run: |
+          find . -name '*.apk' | while read apk; do
+            sha256sum "$apk" > "${apk}.sha256"
+          done
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: myapk
+          path: |
+            app/build/outputs/apk/release/*.apk
+            app/build/outputs/apk/release/*.sha256
+
