@@ -11,6 +11,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Cancel previous runs
+        uses: styfle/cancel-workflow-action@0.12.1
+        with:
+          access_token: ${{ github.token }}
+
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
@@ -25,8 +30,33 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      - name: Build
+      - name: Increase Gradle memory
+        run: echo "\norg.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g\n" >> gradle.properties
+
+      - name: Build Debug
         run: ./gradlew assembleDebug
 
-      - name: Run unit tests
+      - name: Build Release
+        run: ./gradlew assembleRelease
+
+      - name: Run Debug unit tests
         run: ./gradlew testDebugUnitTest
+
+      - name: Run Release unit tests
+        run: ./gradlew testReleaseUnitTest
+
+      - name: Generate SHA256 checksums
+        run: |
+          find . -name '*.apk' | while read apk; do
+            sha256sum "$apk" > "${apk}.sha256"
+          done
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: myapk
+          path: |
+            app/build/outputs/apk/debug/*.apk
+            app/build/outputs/apk/debug/*.sha256
+            app/build/outputs/apk/release/*.apk
+            app/build/outputs/apk/release/*.sha256
