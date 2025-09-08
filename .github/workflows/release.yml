@@ -29,7 +29,7 @@ jobs:
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
-      
+
       - name: Build GitHub release APK
         run: |
           ./gradlew assembleGithub \
