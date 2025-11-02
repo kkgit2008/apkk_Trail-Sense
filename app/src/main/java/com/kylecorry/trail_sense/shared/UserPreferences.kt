@@ -8,6 +8,10 @@ import com.kylecorry.andromeda.preferences.BooleanPreference
 import com.kylecorry.andromeda.preferences.IntEnumPreference
 import com.kylecorry.andromeda.preferences.IntPreference
 import com.kylecorry.andromeda.preferences.StringEnumPreference
+import com.kylecorry.andromeda.preferences.getIntArray
+import com.kylecorry.andromeda.preferences.getLongArray
+import com.kylecorry.andromeda.preferences.putIntArray
+import com.kylecorry.andromeda.preferences.putLongArray
 import com.kylecorry.sol.units.Coordinate
 import com.kylecorry.sol.units.Distance
 import com.kylecorry.sol.units.PressureUnits
@@ -34,16 +38,11 @@ import com.kylecorry.trail_sense.settings.infrastructure.PrivacyPreferences
 import com.kylecorry.trail_sense.settings.infrastructure.ThermometerPreferences
 import com.kylecorry.trail_sense.settings.infrastructure.TidePreferences
 import com.kylecorry.trail_sense.shared.alerts.NotificationSubsystem
-import com.kylecorry.trail_sense.shared.extensions.getIntArray
-import com.kylecorry.trail_sense.shared.extensions.getLongArray
-import com.kylecorry.trail_sense.shared.extensions.putIntArray
-import com.kylecorry.trail_sense.shared.extensions.putLongArray
 import com.kylecorry.trail_sense.shared.preferences.PreferencesSubsystem
 import com.kylecorry.trail_sense.shared.sharing.MapSite
 import com.kylecorry.trail_sense.tools.astronomy.infrastructure.AstronomyPreferences
 import com.kylecorry.trail_sense.tools.ballistics.infrastructure.BallisticsPreferences
 import com.kylecorry.trail_sense.tools.climate.infrastructure.ClimatePreferenceRepo
-import com.kylecorry.trail_sense.tools.field_guide.infrastructure.FieldGuidePreferences
 import com.kylecorry.trail_sense.tools.map.infrastructure.MapPreferences
 import com.kylecorry.trail_sense.tools.photo_maps.infrastructure.PhotoMapPreferences
 import com.kylecorry.trail_sense.tools.navigation.infrastructure.NavigationPreferences
@@ -83,7 +82,6 @@ class UserPreferences(ctx: Context) : IDeclinationPreferences {
     val backup by lazy { BackupPreferences(context) }
     val ballistics by lazy { BallisticsPreferences(context) }
     val climate by lazy { ClimatePreferenceRepo(context) }
-    val fieldGuide by lazy { FieldGuidePreferences(context) }
     val waterBoilTimer by lazy { WaterBoilTimerPreferences(context) }
     val turnBack by lazy { TurnBackPreferences(context) }
 
@@ -264,6 +262,10 @@ class UserPreferences(ctx: Context) : IDeclinationPreferences {
             cache.putString(getString(R.string.pref_longitude_override), value.longitude.toString())
         }
 
+    val hasLocationOverride: Boolean
+        get() = cache.contains(getString(R.string.pref_latitude_override)) &&
+                cache.contains(getString(R.string.pref_longitude_override))
+
     var altitudeOverride: Float
         get() {
             val raw = cache.getString(getString(R.string.pref_altitude_override)) ?: "0.0"
@@ -394,6 +396,7 @@ class UserPreferences(ctx: Context) : IDeclinationPreferences {
                 ?.map { it.toLong() }
                 ?: listOf(
                     Tools.NAVIGATION,
+                    Tools.MAP,
                     Tools.WEATHER,
                     Tools.ASTRONOMY
                 ))
@@ -461,13 +464,13 @@ class UserPreferences(ctx: Context) : IDeclinationPreferences {
         Light, Dark, Black, System, SunriseSunset, Night, SystemBlack
     }
 
-    enum class AltimeterMode {
-        GPS,
-        GPSBarometer,
-        Barometer,
-        DigitalElevationModel,
-        DigitalElevationModelBarometer,
-        Override
+    enum class AltimeterMode(val usesDem: Boolean) {
+        GPS(false),
+        GPSBarometer(false),
+        Barometer(false),
+        DigitalElevationModel(true),
+        DigitalElevationModelBarometer(true),
+        Override(false)
     }
 
 }

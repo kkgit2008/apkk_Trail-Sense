@@ -54,6 +54,7 @@ import com.kylecorry.trail_sense.shared.sensors.altimeter.DigitalElevationModel
 import com.kylecorry.trail_sense.shared.sensors.altimeter.GaussianAltimeterWrapper
 import com.kylecorry.trail_sense.shared.sensors.altimeter.OverrideAltimeter
 import com.kylecorry.trail_sense.shared.sensors.barometer.CalibratedBarometer
+import com.kylecorry.trail_sense.shared.sensors.gps.TimezoneGPS
 import com.kylecorry.trail_sense.shared.sensors.hygrometer.MockHygrometer
 import com.kylecorry.trail_sense.shared.sensors.overrides.CachedGPS
 import com.kylecorry.trail_sense.shared.sensors.overrides.OverrideGPS
@@ -83,8 +84,12 @@ class SensorService(ctx: Context) {
 
         val hasPermission = hasLocationPermission()
 
-        if (!userPrefs.useAutoLocation || !hasPermission) {
+        if (!userPrefs.useAutoLocation || (!hasPermission && userPrefs.hasLocationOverride)) {
             return OverrideGPS(context, frequency.toMillis())
+        }
+
+        if (!hasPermission) {
+            return TimezoneGPS(frequency.toMillis())
         }
 
         if (GPS.isAvailable(context)) {
@@ -152,13 +157,19 @@ class SensorService(ctx: Context) {
                 return CachedAltimeter(context)
             }
 
-            return gps ?: getGPS()
+            val actualGPS = gps ?: getGPS()
+
+            if (mode.usesDem) {
+                return getDigitalElevationModel(gps)
+            }
+
+            return actualGPS
         }
     }
 
     private fun getDigitalElevationModel(gps: IGPS? = null): IGPS {
         return DigitalElevationModel(
-            context, gps ?: getGPS()
+            gps ?: getGPS()
         )
     }
 
@@ -239,8 +250,12 @@ class SensorService(ctx: Context) {
         return Sensors.hasGyroscope(context)
     }
 
-    fun getCompass(): ICompass {
-        return CompassProvider(context, userPrefs.compass).get(MOTION_SENSOR_DELAY)
+    // TODO: Expose a way to see that a disturbance is present
+    fun getCompass(orientationSensor: IOrientationSensor? = null): ICompass {
+        return CompassProvider(context, userPrefs.compass).get(
+            MOTION_SENSOR_DELAY,
+            orientationSensor
+        )
     }
 
     fun getOrientation(): IOrientationSensor {
@@ -311,7 +326,8 @@ class SensorService(ctx: Context) {
         return CellSignalSensor(
             context,
             userPrefs.cellSignal.populateCache,
-            removeUnregisteredSignals
+            removeUnregisteredSignals,
+            pathLossFactor = 0.1f
         )
     }
 

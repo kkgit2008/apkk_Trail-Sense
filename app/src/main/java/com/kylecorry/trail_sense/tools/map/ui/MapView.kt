@@ -8,19 +8,22 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import com.kylecorry.andromeda.canvas.CanvasView
+import com.kylecorry.andromeda.canvas.withLayerOpacity
 import com.kylecorry.andromeda.core.units.PixelCoordinate
 import com.kylecorry.luna.hooks.Hooks
+import com.kylecorry.sol.math.SolMath
 import com.kylecorry.sol.math.SolMath.deltaAngle
 import com.kylecorry.sol.math.Vector2
 import com.kylecorry.sol.math.geometry.Rectangle
+import com.kylecorry.sol.science.geography.projections.IMapProjection
 import com.kylecorry.sol.science.geography.projections.MercatorProjection
 import com.kylecorry.sol.science.geology.CoordinateBounds
 import com.kylecorry.sol.science.geology.Geology
 import com.kylecorry.sol.units.Coordinate
-import com.kylecorry.trail_sense.shared.andromeda_temp.withLayerOpacity
 import com.kylecorry.trail_sense.shared.map_layers.ui.layers.IAsyncLayer
 import com.kylecorry.trail_sense.shared.map_layers.ui.layers.ILayer
 import com.kylecorry.trail_sense.shared.map_layers.ui.layers.IMapView
+import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.math.min
 
@@ -37,6 +40,8 @@ class MapView(context: Context, attrs: AttributeSet? = null) : CanvasView(contex
     private val hooks = Hooks()
 
     private var onLongPressCallback: ((Coordinate) -> Unit)? = null
+    private var onScaleChange: ((metersPerPixel: Float) -> Unit)? = null
+    private var onCenterChange: ((center: Coordinate) -> Unit)? = null
 
     init {
         runEveryCycle = false
@@ -46,7 +51,6 @@ class MapView(context: Context, attrs: AttributeSet? = null) : CanvasView(contex
         onLongPressCallback = callback
     }
 
-    // TODO: Expose a method to fit to bounds (sets map center and meters per pixel)
     override val mapBounds: CoordinateBounds
         get() = hooks.memo("bounds", metersPerPixel, mapCenter, width, height, mapAzimuth != 0f) {
             // Increase size to account for 45 degree rotation
@@ -84,6 +88,7 @@ class MapView(context: Context, attrs: AttributeSet? = null) : CanvasView(contex
     override var mapCenter: Coordinate = Coordinate.zero
         set(value) {
             field = value
+            onCenterChange?.invoke(value)
             invalidate()
         }
 
@@ -94,9 +99,39 @@ class MapView(context: Context, attrs: AttributeSet? = null) : CanvasView(contex
         }
     override val mapRotation: Float = 0f
 
-    private var scale = 1f
+    var scale = 1f
+        private set(value) {
+            field = value
+            onScaleChange?.invoke(metersPerPixel)
+            invalidate()
+        }
     private var lastScale = 1f
-    private var minScale = 0.0002f
+    var minScale = 0.0002f
+        set(value) {
+            field = value
+            if (scale < minScale) {
+                zoomTo(minScale)
+            }
+            invalidate()
+        }
+
+    var constraintBounds: CoordinateBounds = CoordinateBounds(85.0, 180.0, -85.0, -180.0)
+        set(value) {
+            field = value
+            if (!field.contains(mapCenter)) {
+                mapCenter = field.center
+            }
+            invalidate()
+        }
+
+    var projection: IMapProjection = MercatorProjection()
+        set(value) {
+            field = value
+            layers.forEach { it.invalidate() }
+            invalidate()
+        }
+
+
     private var maxScale = 1f
     private var isScaling = false
 
@@ -112,10 +147,8 @@ class MapView(context: Context, attrs: AttributeSet? = null) : CanvasView(contex
         this.layers.clear()
         this.layers.addAll(layers)
         this.layers.filterIsInstance<IAsyncLayer>()
-            .forEach { it.setHasUpdateListener { invalidate() } }
+            .forEach { it.setHasUpdateListener { post { invalidate() } } }
     }
-
-    private val projection = MercatorProjection()
 
     override fun toPixel(coordinate: Coordinate): PixelCoordinate {
         val center = projection.toPixels(mapCenter)
@@ -208,6 +241,57 @@ class MapView(context: Context, attrs: AttributeSet? = null) : CanvasView(contex
         invalidate()
     }
 
+    // TODO: Extract to Sol
+    private inline fun newtonRaphsonIteration(
+        initialValue: Float = 0f,
+        tolerance: Float = SolMath.EPSILON_FLOAT,
+        maxIterations: Int = Int.MAX_VALUE,
+        crossinline calculate: (lastValue: Float) -> Float
+    ): Float {
+        var lastValue = initialValue
+        var iterations = 0
+        var delta: Float
+        do {
+            val newValue = calculate(initialValue)
+            delta = newValue - lastValue
+            lastValue = newValue
+            iterations++
+        } while (iterations < maxIterations && delta.absoluteValue > tolerance)
+        return lastValue
+    }
+
+    // TODO: This doesn't work for world maps
+    fun fitIntoView(bounds: CoordinateBounds, paddingFactor: Float = 1.25f) {
+        if (width == 0 || height == 0) {
+            return
+        }
+
+        newtonRaphsonIteration(scale, 0.001f, 10) {
+            mapCenter = bounds.center
+            val nePixel = toPixel(bounds.northEast)
+            val sePixel = toPixel(bounds.southEast)
+            val nwPixel = toPixel(bounds.northWest)
+            val swPixel = toPixel(bounds.southWest)
+            val minX = minOf(nePixel.x, sePixel.x, nwPixel.x, swPixel.x)
+            val maxX = maxOf(nePixel.x, sePixel.x, nwPixel.x, swPixel.x)
+            val minY = minOf(nePixel.y, sePixel.y, nwPixel.y, swPixel.y)
+            val maxY = maxOf(nePixel.y, sePixel.y, nwPixel.y, swPixel.y)
+            val boxWidth = (maxX - minX).absoluteValue * paddingFactor
+            val boxHeight = (maxY - minY).absoluteValue * paddingFactor
+
+            if (boxWidth == 0f || boxHeight == 0f) {
+                return@newtonRaphsonIteration 0f
+            }
+
+            val scaleX = width / boxWidth
+            val scaleY = height / boxHeight
+            val newScale = min(scaleX, scaleY)
+            zoom(newScale)
+            newScale
+        }
+        invalidate()
+    }
+
     @Suppress("MemberVisibilityCanBePrivate")
     fun zoomTo(newScale: Float) {
         if (newScale == scale) {
@@ -231,8 +315,14 @@ class MapView(context: Context, attrs: AttributeSet? = null) : CanvasView(contex
         val newPoint = PixelCoordinate(width / 2f + distanceX, height / 2f + distanceY)
         val newCenter = toCoordinate(newPoint)
         mapCenter = Coordinate(
-            newCenter.latitude.coerceIn(-85.0, 85.0),
-            Coordinate.toLongitude(newCenter.longitude)
+            newCenter.latitude.coerceIn(
+                constraintBounds.south,
+                constraintBounds.north
+            ),
+            Coordinate.toLongitude(newCenter.longitude).coerceIn(
+                min(constraintBounds.west, constraintBounds.east),
+                max(constraintBounds.west, constraintBounds.east)
+            )
         )
         invalidate()
     }
@@ -359,5 +449,13 @@ class MapView(context: Context, attrs: AttributeSet? = null) : CanvasView(contex
 
             return PointF(pointArray[0], pointArray[1])
         }
+    }
+
+    fun setOnScaleChangeListener(callback: ((metersPerPixel: Float) -> Unit)?) {
+        onScaleChange = callback
+    }
+
+    fun setOnCenterChangeListener(callback: ((center: Coordinate) -> Unit)?) {
+        onCenterChange = callback
     }
 }

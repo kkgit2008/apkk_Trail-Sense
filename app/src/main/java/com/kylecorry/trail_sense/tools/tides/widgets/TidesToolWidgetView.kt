@@ -3,17 +3,18 @@ package com.kylecorry.trail_sense.tools.tides.widgets
 import android.content.Context
 import android.widget.RemoteViews
 import com.kylecorry.trail_sense.R
-import com.kylecorry.trail_sense.shared.extensions.setImageViewResourceAsIcon
+import com.kylecorry.andromeda.views.remote.setImageViewResourceAsIcon
 import com.kylecorry.trail_sense.shared.navigation.NavigationUtils
 import com.kylecorry.trail_sense.tools.tides.subsystem.TidesSubsystem
 import com.kylecorry.trail_sense.tools.tides.ui.TideFormatter
 import com.kylecorry.trail_sense.tools.tools.infrastructure.Tools
 import com.kylecorry.trail_sense.tools.tools.ui.widgets.SimpleToolWidgetView
+import com.kylecorry.trail_sense.tools.tools.widgets.WidgetPreferences
 
 class TidesToolWidgetView : SimpleToolWidgetView() {
 
-    override suspend fun getPopulatedView(context: Context): RemoteViews {
-        val views = getView(context)
+    override suspend fun getPopulatedView(context: Context, prefs: WidgetPreferences?): RemoteViews {
+        val views = getView(context, prefs)
         val formatter = TideFormatter(context)
         val tide = TidesSubsystem.getInstance(context).getNearestTide()
 

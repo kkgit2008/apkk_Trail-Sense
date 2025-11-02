@@ -8,10 +8,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.kylecorry.andromeda.alerts.Alerts
 import com.kylecorry.andromeda.core.sensors.IAltimeter
+import com.kylecorry.andromeda.core.sensors.ISpeedometer
 import com.kylecorry.andromeda.core.ui.ReactiveComponent
 import com.kylecorry.andromeda.core.ui.useCallback
 import com.kylecorry.andromeda.core.ui.useService
@@ -24,6 +26,8 @@ import com.kylecorry.andromeda.preferences.IPreferences
 import com.kylecorry.andromeda.sense.compass.ICompass
 import com.kylecorry.andromeda.sense.location.IGPS
 import com.kylecorry.andromeda.signal.ICellSignalSensor
+import com.kylecorry.luna.timer.CoroutineTimer
+import com.kylecorry.luna.timer.TimerActionBehavior
 import com.kylecorry.sol.units.Bearing
 import com.kylecorry.sol.units.Coordinate
 import com.kylecorry.sol.units.Distance
@@ -43,7 +47,11 @@ import com.kylecorry.trail_sense.shared.sensors.SensorSubsystem
 import com.kylecorry.trail_sense.shared.views.CoordinateInputView
 import com.kylecorry.trail_sense.shared.views.ElevationInputView
 import com.kylecorry.trail_sense.shared.views.SearchView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import java.time.Duration
+import java.util.UUID
+import kotlin.coroutines.CoroutineContext
 
 // Sensors
 
@@ -73,6 +81,13 @@ fun AndromedaFragment.useAltimeterSensor(gps: IGPS? = null): IAltimeter {
     }
 }
 
+fun ReactiveComponent.useSpeedometerSensor(gps: IGPS? = null): ISpeedometer {
+    val sensors = useService<SensorService>()
+    return useMemo(sensors, gps) {
+        sensors.getSpeedometer(gps = gps)
+    }
+}
+
 // Common sensor readings
 fun AndromedaFragment.useGPSLocation(frequency: Duration = Duration.ofMillis(20)): Pair<Coordinate, Float?> {
     val gps = useGPSSensor(frequency)
@@ -81,22 +96,15 @@ fun AndromedaFragment.useGPSLocation(frequency: Duration = Duration.ofMillis(20)
     }
 }
 
-fun AndromedaFragment.useCompassBearing(applyDeclination: Boolean): Bearing {
-    val sensors = useService<SensorService>()
-    val compass = useMemo(sensors) { sensors.getCompass() }
-    return useTopic(compass, compass.bearing) {
-        compass.bearing
-    }
-}
-
 data class NavigationSensorValues(
     val location: Coordinate,
-    val locationAccuracy: Float?,
-    val elevation: Float,
-    val elevationAccuracy: Float?,
-    val bearing: Float,
+    val locationAccuracy: Distance?,
+    val elevation: Distance,
+    val elevationAccuracy: Distance?,
+    val bearing: Bearing,
     val declination: Float,
-    val speed: Speed
+    val speed: Speed,
+    val gpsSpeed: Speed
 )
 
 fun AndromedaFragment.useNavigationSensors(
@@ -106,29 +114,59 @@ fun AndromedaFragment.useNavigationSensors(
     val gps = useGPSSensor(gpsFrequency)
     val compass = useCompassSensor()
     val altimeter = useAltimeterSensor(gps)
+    val speedometer = useSpeedometerSensor(gps)
     val prefs = useService<UserPreferences>()
+
+    val defaultGpsReading = useMemo(gps) {
+        Triple(gps.location, gps.horizontalAccuracy?.let { Distance.meters(it) }, gps.speed)
+    }
+
+    val defaultSpeedReading = useMemo(speedometer) {
+        speedometer.speed
+    }
+
+    val defaultElevationReading = useMemo(altimeter, gps) {
+        Distance.meters(altimeter.altitude) to (if (altimeter is IGPS) altimeter.verticalAccuracy else gps.verticalAccuracy)?.let {
+            Distance.meters(
+                it
+            )
+        }
+    }
+
+    val defaultCompassReading = useMemo(compass) {
+        compass.bearing
+    }
+
     val declinationProvider = useMemo(prefs, gps) {
         DeclinationFactory().getDeclinationStrategy(prefs, gps)
     }
     val declination = useMemo(gps.location) { declinationProvider.getDeclination() }
     useEffect(compass, declination) { compass.declination = if (trueNorth) declination else 0f }
 
-    val (location, locationAccuracy, speed) = useTopic(
+    val (location, locationAccuracy, gpsSpeed) = useTopic(
         gps,
-        Triple(gps.location, gps.horizontalAccuracy, gps.speed)
+        defaultGpsReading
     ) {
-        Triple(gps.location, gps.horizontalAccuracy, gps.speed)
+        Triple(gps.location, gps.horizontalAccuracy?.let { Distance.meters(it) }, gps.speed)
+    }
+
+    val speed = useTopic(speedometer, defaultSpeedReading) {
+        speedometer.speed
     }
 
     val (elevation, elevationAccuracy) = useTopic(
         altimeter,
-        altimeter.altitude to if (altimeter is IGPS) altimeter.verticalAccuracy else gps.verticalAccuracy
+        defaultElevationReading
     ) {
-        altimeter.altitude to if (altimeter is IGPS) altimeter.verticalAccuracy else gps.verticalAccuracy
+        Distance.meters(altimeter.altitude) to (if (altimeter is IGPS) altimeter.verticalAccuracy else gps.verticalAccuracy)?.let {
+            Distance.meters(
+                it
+            )
+        }
     }
 
-    val bearing = useTopic(compass, compass.rawBearing) {
-        compass.rawBearing
+    val bearing = useTopic(compass, defaultCompassReading) {
+        compass.bearing
     }
 
     return useMemo(
@@ -138,7 +176,8 @@ fun AndromedaFragment.useNavigationSensors(
         elevationAccuracy,
         bearing,
         declination,
-        speed
+        speed,
+        gpsSpeed
     ) {
         NavigationSensorValues(
             location,
@@ -147,7 +186,8 @@ fun AndromedaFragment.useNavigationSensors(
             elevationAccuracy,
             bearing,
             declination,
-            speed
+            speed,
+            gpsSpeed
         )
     }
 }
@@ -295,6 +335,12 @@ fun ReactiveComponent.useIntPreference(
     return usePreference(key, IPreferences::getInt, IPreferences::putInt)
 }
 
+fun ReactiveComponent.useCoordinatePreference(
+    key: String
+): Pair<Coordinate?, (Coordinate?) -> Unit> {
+    return usePreference(key, IPreferences::getCoordinate, IPreferences::putCoordinate)
+}
+
 fun ReactiveComponent.useDistancePreference(
     key: String
 ): Pair<Distance?, (Distance?) -> Unit> {
@@ -302,7 +348,7 @@ fun ReactiveComponent.useDistancePreference(
     val (unit, setUnit) = useIntPreference("$key-unit")
 
     val setter = useCallback { distance: Distance? ->
-        setValue(distance?.distance)
+        setValue(distance?.value)
         setUnit(distance?.units?.id)
     }
 
@@ -311,7 +357,9 @@ fun ReactiveComponent.useDistancePreference(
             return@useMemo null
         }
 
-        Distance(value, DistanceUnits.entries.firstOrNull { it.id == unit } ?: DistanceUnits.Meters)
+        Distance.from(
+            value,
+            DistanceUnits.entries.firstOrNull { it.id == unit } ?: DistanceUnits.Meters)
     }
 
     return distance to setter
@@ -324,7 +372,7 @@ fun ReactiveComponent.useWeightPreference(
     val (unit, setUnit) = useIntPreference("$key-unit")
 
     val setter = useCallback { weight: Weight? ->
-        setValue(weight?.weight)
+        setValue(weight?.value)
         setUnit(weight?.units?.id)
     }
 
@@ -333,7 +381,9 @@ fun ReactiveComponent.useWeightPreference(
             return@useMemo null
         }
 
-        Weight(value, WeightUnits.entries.firstOrNull { it.id == unit } ?: WeightUnits.Kilograms)
+        Weight.from(
+            value,
+            WeightUnits.entries.firstOrNull { it.id == unit } ?: WeightUnits.Kilograms)
     }
 
     return weight to setter
@@ -357,7 +407,7 @@ fun ReactiveComponent.useSpeedPreference(
             return@useMemo null
         }
 
-        Speed(
+        Speed.from(
             value,
             DistanceUnits.entries.firstOrNull { it.id == distanceUnit } ?: DistanceUnits.Meters,
             TimeUnits.entries.firstOrNull { it.id == timeUnit } ?: TimeUnits.Seconds
@@ -467,4 +517,68 @@ fun ReactiveComponent.usePauseEffect(vararg values: Any?, action: () -> Unit) {
     ) {
         action()
     }
+}
+
+fun ReactiveComponent.useResumeEffect(vararg values: Any?, action: () -> Unit) {
+    useLifecycleEffect(
+        Lifecycle.Event.ON_RESUME,
+        *values
+    ) {
+        action()
+    }
+}
+
+
+// LiveData
+fun <T : Any, V> ReactiveComponent.useLiveData(
+    data: LiveData<T>,
+    default: V,
+    mapper: (T) -> V
+): V {
+    val (state, setState) = useState(default)
+    val owner = useLifecycleOwner()
+
+    // Note: This does not change when the mapper changes
+    useEffect(data, owner) {
+        data.observe(owner) {
+            setState(mapper(it))
+        }
+    }
+
+    return state
+}
+
+fun <T : Any, V> ReactiveComponent.useLiveData(
+    data: LiveData<T>,
+    mapper: (T) -> V?
+): V? {
+    return useLiveData(data, null, mapper)
+}
+
+fun ReactiveComponent.useTimer(
+    interval: Long,
+    scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
+    observeOn: CoroutineContext = Dispatchers.Main,
+    actionBehavior: TimerActionBehavior = TimerActionBehavior.Wait,
+    runnable: suspend () -> Unit
+) {
+    val timer = useMemo {
+        CoroutineTimer(scope, observeOn, actionBehavior, runnable)
+    }
+
+    useResumeEffect(timer, interval) {
+        timer.interval(interval)
+    }
+
+    usePauseEffect(timer) {
+        timer.stop()
+    }
+}
+
+fun ReactiveComponent.useTrigger(): Pair<String, () -> Unit> {
+    val (key, setKey) = useState("")
+    val trigger = useCallback<Unit> {
+        setKey(UUID.randomUUID().toString())
+    }
+    return useMemo(key, trigger) { key to trigger }
 }

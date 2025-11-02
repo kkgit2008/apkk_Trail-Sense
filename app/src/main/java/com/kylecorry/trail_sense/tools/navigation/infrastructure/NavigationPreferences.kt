@@ -29,6 +29,7 @@ import com.kylecorry.trail_sense.tools.paths.infrastructure.persistence.IPathPre
 import com.kylecorry.trail_sense.tools.paths.map_layers.PathMapLayerPreferences
 import com.kylecorry.trail_sense.tools.paths.ui.PathSortMethod
 import com.kylecorry.trail_sense.tools.photo_maps.map_layers.PhotoMapMapLayerPreferences
+import com.kylecorry.trail_sense.tools.signal_finder.map_layers.CellTowerMapLayerPreferences
 import com.kylecorry.trail_sense.tools.tides.map_layers.TideMapLayerPreferences
 import com.kylecorry.trail_sense.tools.tools.infrastructure.Tools
 import java.time.Duration
@@ -155,14 +156,14 @@ class NavigationPreferences(private val context: Context) : ICompassStylePrefere
                 cache.getString(context.getString(R.string.pref_max_beacon_distance)) ?: "0.5"
             return Distance.kilometers(raw.toFloatCompat() ?: 0.5f)
                 .meters()
-                .distance
+                .value
                 .coerceIn(1f, 25000000f)
         }
         set(value) {
             val meters = Distance.meters(value.coerceIn(1f, 25000000f))
             cache.putString(
                 context.getString(R.string.pref_max_beacon_distance),
-                meters.convertTo(DistanceUnits.Kilometers).distance.toString()
+                meters.convertTo(DistanceUnits.Kilometers).value.toString()
             )
         }
 
@@ -228,6 +229,9 @@ class NavigationPreferences(private val context: Context) : ICompassStylePrefere
         SpeedometerMode.GPS
     )
 
+    // TODO: Make this configurable
+    var useLocationWithBearing = true
+
     // Layers
 
     private val mapId = "navigation"
@@ -239,6 +243,7 @@ class NavigationPreferences(private val context: Context) : ICompassStylePrefere
     val myLocationLayer = MyLocationMapLayerPreferences(context, mapId)
     val elevationLayer = ElevationMapLayerPreferences(context, mapId)
     val hillshadeLayer = HillshadeMapLayerPreferences(context, mapId)
+    val cellTowerLayer = CellTowerMapLayerPreferences(context, mapId)
 
     val layerManager = MapLayerPreferenceManager(
         mapId, listOf(
@@ -246,6 +251,7 @@ class NavigationPreferences(private val context: Context) : ICompassStylePrefere
             hillshadeLayer.getPreferences(),
             photoMapLayer.getPreferences(),
             contourLayer.getPreferences(),
+            cellTowerLayer.getPreferences(),
             pathLayer.getPreferences(),
             beaconLayer.getPreferences(),
             tideLayer.getPreferences(),

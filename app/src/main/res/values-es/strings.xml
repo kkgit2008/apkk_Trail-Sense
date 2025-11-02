@@ -162,7 +162,7 @@
     <string name="inventory_empty_text">Ningún elemento</string>
     <string name="tool_whistle_title">Silbato</string>
     <string name="tool_cliff_height_description">Mide la altura de un precipicio o una caída</string>
-    <string name="tool_cliff_height_disclaimer">Utilice esta herramienta solo cuando sea seguro, y asegúrese de comprobar qué hay debajo del precipicio para evitar heridas. Mire la guía de uso para instrucciones.</string>
+    <string name="tool_cliff_height_disclaimer">Usa esta herramienta sólo cuando sea seguro y asegúrate de comprobar qué hay debajo del precipicio para evitar heridas. Ve a la guía de usuario para instrucciones.</string>
     <string name="tool_cliff_height_title">Altura de precipicio</string>
     <string name="toast_destination_bearing_set">Orientación al destino establecida</string>
     <string name="category_natural">Natural</string>
@@ -173,7 +173,7 @@
     <string name="category_clothing">Vestimenta</string>
     <string name="category_hydration">Hidratación</string>
     <string name="category_food">Comida</string>
-    <string name="other">Otro</string>
+    <string name="other">Otros</string>
     <string name="tool_bubble_level_summary">Determina si una superficie es plana</string>
     <string name="tool_bubble_level_title">Nivel de burbuja</string>
     <string name="navigation_nearby_category">Cerca</string>
@@ -278,27 +278,7 @@
     <string name="thunder">Trueno</string>
     <string name="pedometer">Podómetro</string>
     <string name="import_btn">Importar</string>
-    <string name="onboarding_privacy">- Trail Sense respeta tu privacidad y los datos de localización nunca salen de tu dispositivo
-\n
-\n- Trail Sense nunca requerirá permiso de Internet
-\n
-\n- Ver la [política de privacidad](https://kylecorry.com/Trail-Sense/privacy_policy.html) (se abre en el navegador de tu teléfono)
-\n
-\n- Algunas funciones de Trail Sense requieren acceso a tu ubicación
-\n
-\n- Conceder el permiso de ubicación habilitará las siguientes funciones:
-\n
-\n\t- Navegación hacia balizas
-\n
-\n\t- Mejora de la precisión de las previsiones (no disponible en todos los dispositivos)
-\n
-\n\t- Retroceso
-\n
-\n\t- Horas de sol y luna para su ubicación actual (las alertas de puesta de sol pueden requerir una ubicación de fondo)
-\n
-\n- Si decides no conceder el permiso de ubicación, puedes introducir manualmente una ubicación en el menú Configuración &gt; Sensores &gt; Calibración GPS en Trail Sense.
-\n
-\n- Tras hacer clic en Continuar, se te pedirá que concedas el permiso de ubicación. Si deniegas este permiso, Trail Sense no podrá acceder a tu ubicación, por lo que se recomienda introducirla manualmente.</string>
+    <string name="onboarding_privacy">- Trail Sense respeta tu privacidad y los datos de localización nunca salen de tu dispositivo \n \n- Trail Sense nunca requerirá permiso de Internet \n \n- Ver la [política de privacidad](https://kylecorry.com/Trail-Sense/privacy_policy.html) (se abre en el navegador de tu teléfono) \n \n- Algunas funciones de Trail Sense requieren acceso a tu ubicación \n \n- Conceder el permiso de ubicación habilitará las siguientes funciones: \n \n\t- Navegación hacia balizas \n \n\t- Precisión de las previsiones mejorada (no disponible en todos los dispositivos) \n \n\t- Retroceder por la ruta \n \n\t- Horas de sol y luna para tu ubicación actual (las alertas de puesta de sol pueden requerir una ubicación de fondo) \n \n- Si decides no conceder el permiso de ubicación, puedes introducir manualmente una ubicación en el menú Configuración &gt; Sensores &gt; Calibración GPS en Trail Sense. \n \n- Tras hacer clic en Continuar, se te pedirá que concedas el permiso de ubicación. Si deniegas este permiso, Trail Sense no podrá acceder a tu ubicación, por lo que se recomienda introducirla manualmente.</string>
     <plurals name="beacons_exported">
         <item quantity="one">%d baliza exportada</item>
         <item quantity="many">%d balizas exportadas</item>
@@ -309,7 +289,7 @@
     <string name="quality_good">Buena</string>
     <string name="network_2g">2G</string>
     <string name="network_3g">3G</string>
-    <string name="pref_backtrack_save_cell_summary">Registra la señal telefónica en el waypoint. No utiliza Internet.</string>
+    <string name="pref_backtrack_save_cell_summary">Registra la señal telefónica en el waypoint. No usa Internet.</string>
     <string name="candela_format">%s cd</string>
     <string name="todays_forecast">Pronóstico para hoy</string>
     <string name="guide_light_meter_description">Determinar la distancia a un haz de luz (ej. linterna)</string>
@@ -381,7 +361,7 @@
     <string name="pref_backtrack_enabled_summary">Grabar historial de ubicación</string>
     <string name="pref_backtrack_frequency_title">Intervalo de Retroceso</string>
     <string name="elevation_override_updated_toast">Anulación de altitud actualizada</string>
-    <string name="pref_elevation_override_sea_level_dialog_msg">Introduzca la presión actual al nivel del mar en hPa</string>
+    <string name="pref_elevation_override_sea_level_dialog_msg">Introduce la presión actual al nivel del mar en hPa</string>
     <string name="two">2</string>
     <string name="precise_centimeters_format">%s cm</string>
     <string name="tool_ruler_title">Regla</string>
@@ -427,9 +407,7 @@
     <string name="altostratus_desc">Una nube de nivel medio que cubre el cielo. El sol apenas puede verse como una mancha brillante.</string>
     <string name="nimbostratus_desc">Nube de nivel medio de color gris oscuro que cubre el cielo. Si no llueve, puede tratarse de una nube estrato.</string>
     <string name="stratocumulus_desc">Nubes bajas que parecen una sábana de bolas de algodón con pequeños huecos. El color va del blanco al gris oscuro.</string>
-    <string name="onboarding_user_guide">Aprende a utilizar las funciones de Trail Sense con la guía del usuario. Disponible en la parte inferior de la pestaña Herramientas
-\n
-\nMás guías estarán disponibles pronto.</string>
+    <string name="onboarding_user_guide">Aprende a usar las funciones de Trail Sense con la guía de usuario. Disponible en la parte inferior de la pestaña Herramientas \n \nPronto estarán disponibles más guías.</string>
     <string name="export">Exportar</string>
     <plurals name="beacons_imported">
         <item quantity="one">%d baliza importada</item>
@@ -512,7 +490,7 @@
     <string name="weather_monitor">Estación meteorológica</string>
     <string name="battery_history">Historial de la batería: último %s</string>
     <string name="elevation_from_pressure">Establecer la anulación del barómetro</string>
-    <string name="pref_elevation_override_sea_level_dialog_title">Introduzca la presión al nivel del mar</string>
+    <string name="pref_elevation_override_sea_level_dialog_title">Introduce la presión al nivel del mar</string>
     <string name="pref_elevation_override_sea_level_title">Usando una presión conocida al nivel del mar</string>
     <string name="unsaved_changes">Cambios sin guardar</string>
     <string name="solar_panel_instructions">Coloque su teléfono en la parte frontal del panel solar para comenzar.</string>
@@ -567,7 +545,7 @@
     <string name="pref_show_nearest_tide_title">Mostrar marea más cercana</string>
     <string name="weather_monitoring_disabled">Monitoreo meteorológico deshabilitado</string>
     <string name="precipitation_drizzle">Llovizna</string>
-    <string name="pref_nmea_elevation_summary">Utiliza NMEA (satélite) para corregir las elevaciones, en lugar del modelo incorporado</string>
+    <string name="pref_nmea_elevation_summary">Usa NMEA (satélite) para corregir las elevaciones en lugar del modelo incorporado</string>
     <string name="duration">Duracion</string>
     <string name="closest">Mas cercano</string>
     <string name="importing">Importando</string>
@@ -839,23 +817,7 @@
     <string name="temperature_history">Historial de temperatura - últimas %s</string>
     <string name="explore">Explorar</string>
     <string name="file">Archivo</string>
-    <string name="onboarding_explore">- Diseñado para senderismo, backpacking, camping, y geocaching
-\n
-\n- Coloca balizas y navega hacia ellas
-\n
-\n- Sigue rutas
-\n
-\n- Vuelve sobre tus pasos con backtrack
-\n
-\n- Planea qué llevar
-\n
-\n- Recibe alertas antes de que se ponga el sol
-\n
-\n- Predice el tiempo
-\n
-\n- Utiliza tu teléfono como una linterna
-\n
-\n- ¡Y mucho más!</string>
+    <string name="onboarding_explore">- Diseñado para senderismo, backpacking, camping, y geocaching \n \n- Coloca balizas y navega hacia ellas \n \n- Sigue rutas \n \n- Vuelve sobre tus pasos con backtrack \n \n- Planea qué llevar \n \n- Recibe alertas antes de que se ponga el sol \n \n- Predice el tiempo \n \n- Usa el teléfono como linterna \n \n- ¡Y mucho más!</string>
     <string name="camera_capture">Captura</string>
     <string name="error">Error</string>
     <string name="warning">Advertencia</string>
@@ -903,7 +865,7 @@
     </plurals>
     <string name="delete_path_group_message">%s y todas sus rutas se eliminarán.</string>
     <string name="path">Ruta</string>
-    <string name="tide_instructions">Utiliza una tabla de mareas oficial para introducir las mareas de referencia para la duración de tu viaje.</string>
+    <string name="tide_instructions">Usa una tabla de mareas oficial para introducir las mareas de referencia para la duración de tu viaje.</string>
     <string name="tide_frequency_description">El número de mareas altas al día. La mayoría de las mareas son semidiurnas.</string>
     <string name="tide_semidiurnal">Semidiurna</string>
     <string name="frequency">Frecuencia</string>
@@ -981,7 +943,7 @@
     </plurals>
     <string name="historic_temperatures">Temperaturas históricas</string>
     <string name="delete_map_group_message">%s y todos tus mapas serán eliminados.</string>
-    <string name="blank">Blanco</string>
+    <string name="blank">Vacío</string>
     <string name="coordinate_format_osgb">OSGB</string>
     <string name="size">Tamaño</string>
     <string name="create_blank_map">Crear un mapa en blanco</string>
@@ -1033,7 +995,7 @@
     <string name="photo_map_summary">Usar una imágen como mapa</string>
     <string name="beta">Beta</string>
     <string name="crop_map_instructions_long">Arrastra las esquinas del recuadro hasta las esquinas del mapa que deseas contornear. Recortar reducirá la resolución del mapa.</string>
-    <string name="reduce_map_resolution_crop_disclaimer">Recortar el mapa seguirá reduciendo la resolución. Si necesitas recortar el mapa a alta resolución, utiliza una aplicación de edición fotográfica. Hay planes para solucionar este problema en el futuro.</string>
+    <string name="reduce_map_resolution_crop_disclaimer">Recortar el mapa reducirá aún más la resolución. Si necesitas recortar el mapa a alta resolución, usa una aplicación de edición fotográfica. Hay planes para solucionar este problema en el futuro.</string>
     <string name="rotation_amount">Rotación: %s</string>
     <string name="battery_settings_limit_accuracy">Las restricciones de batería limitan la precisión</string>
     <string name="learn_more">Más información</string>
@@ -1076,13 +1038,13 @@
     <string name="enter_manually">Introducir manualmente</string>
     <string name="direction_not_set">Dirección no establecida</string>
     <string name="direction">Dirección</string>
-    <string name="augmented_reality">Realidad aumentada</string>
+    <string name="augmented_reality">Realidad Aumentada</string>
     <string name="augmented_reality_description">Ver balizas cercanas y el sol / luna con tu cámara</string>
     <string name="magnetic_north">Polo Norte magnético</string>
-    <string name="tool_long_press_hint_toast">Pulsa prolongadamente en una herramienta para ver más opciones</string>
-    <string name="unpin">Desbloquear</string>
+    <string name="tool_long_press_hint_toast">Pulsación larga sobre herramienta para más opciones</string>
+    <string name="unpin">Sin pin</string>
     <string name="pinned">Fijado</string>
-    <string name="pin">Bloquear</string>
+    <string name="pin">Pin</string>
     <string name="settings_have_moved_message">Los ajustes de la aplicación se han trasladado a la pestaña Herramientas</string>
     <string name="settings_have_moved">Los ajustes se han desplazado</string>
     <string name="no_sensor_message">Su dispositivo no tiene un sensor %s</string>
@@ -1091,7 +1053,7 @@
     <string name="magnetic_north_description">Apunta al Polo Norte magnético. Se alineará con la mayoría de las brújulas.</string>
     <string name="missing_sensor_explanation">Algunos fabricantes de teléfonos optan por no añadir este sensor, incluso en dispositivos nuevos o caros. Puede obtener más información visitando la página web del fabricante de su dispositivo o poniéndose en contacto con él.</string>
     <string name="no_sensor_unable_to_fix">No, lamentablemente se trata de una función de hardware, por lo que no se puede hacer nada para añadirla.</string>
-    <string name="true_north_description">Señala el polo norte geográfico utilizando la declinación correspondiente a su ubicación. Esto se alineará con la mayoría de los mapas.</string>
+    <string name="true_north_description">Señala el polo norte geográfico usando la declinación correspondiente a tu ubicación. Esto se alineará con la mayoría de los mapas.</string>
     <string name="is_there_a_way_to_fix_this">¿Hay alguna forma de solucionarlo?</string>
     <string name="high_sensitivity">Alta sensibilidad</string>
     <string name="restart_services_message">No se han podido reiniciar los servicios en segundo plano. Pulse para reiniciar.</string>
@@ -1105,7 +1067,7 @@
     <string name="compass_dynamic_colors">Colores dinámicos de la brújula</string>
     <string name="dynamic_colors">Colores dinámicos</string>
     <string name="screen_flashlight_full_name">Brillo de pantalla</string>
-    <string name="compass_dynamic_colors_summary">Utiliza colores dinámicos para los puntos cardinales</string>
+    <string name="compass_dynamic_colors_summary">Usa colores dinámicos para los puntos cardinales</string>
     <string name="view_in_3d">Ver en 3D</string>
     <string name="locate">Localizar</string>
     <string name="fast_path_rendering">Representación rápida de la ruta</string>
@@ -1113,11 +1075,11 @@
     <string name="view_distance">Ver distancia</string>
     <string name="show_dial_ticks_on_nearby_radar">Mostrar las marcas de las esferas en el radar cercano</string>
     <string name="show_dial_ticks_on_nearby_radar_summary">Tu dispositivo no tiene brújula, pero aún así puedes ver en qué dirección están las balizas.</string>
-    <string name="augmented_reality_no_gyro_message">Puede seguir utilizando la herramienta de realidad virtual, pero no será tan precisa.</string>
+    <string name="augmented_reality_no_gyro_message">Puede seguir usando la herramienta de Realidad Aumentada pero no será tan precisa.</string>
     <string name="compact_mode">Modo compacto</string>
     <string name="creating_beacon">Creando baliza</string>
     <string name="ar_calibration_instructions">Centra los %s en la pantalla y pulsa \"Calibrar\"</string>
-    <string name="use_gyroscope_after_calibration">Utilizar el giroscopio tras la calibración</string>
+    <string name="use_gyroscope_after_calibration">Usar el giroscopio tras la calibración</string>
     <string name="use_gyroscope_after_calibration_description">En lugar de la brújula (evita la deriva magnética)</string>
     <string name="reset_calibration_question">¿Reajustar la calibración?</string>
     <string name="scanning_image">Escaneando la imagen</string>
@@ -1158,7 +1120,7 @@
     <string name="no_recorded_cell_signal_nearby">Sin cobertura móvil cerca</string>
     <string name="navigate_to_nearest_cell_signal">Ir a la zona con cobertura más próxima</string>
     <string name="tool_quick_action_name">Herramienta: %s</string>
-    <string name="pref_start_camera_in_3d_view_title">Utilice la cámara para visualización en 3D</string>
+    <string name="pref_start_camera_in_3d_view_title">Usar la cámara para visualización en 3D</string>
     <string name="pref_start_camera_in_3d_view_summary">Abrir la cámara al hacer clic en el botón Ver en 3D</string>
     <string name="pref_flashlight_control_screen_with_volume_title">Controla el brillo de la pantalla con los botones de volumen</string>
     <string name="mirror_camera">Reflejar cámara</string>
@@ -1168,7 +1130,7 @@
     <string name="cloud_scanner">Cloud Scanner</string>
     <string name="local_messaging">Mensajes locales</string>
     <string name="communication">Comunicación</string>
-    <string name="tool_quick_action_summary">Presiona prolongadamente en la parte inferior de la navegación o vista en la pestaña de herramientas</string>
+    <string name="tool_quick_action_summary">Pulsación larga en navegación inferior o ver en la pestaña de herramientas.</string>
     <string name="bottom_navigation_slot">Esquema de navegación inferior %d</string>
     <string name="no_items_found">No se encontraron artículos</string>
     <string name="import_packing_list">Lista de embalaje de importación</string>
@@ -1226,20 +1188,20 @@
         <item quantity="other">%d pasos</item>
     </plurals>
     <string name="widget_updater">Actualizador de widgets</string>
-    <string name="widget_bottom_sheet_instructions">Utilice la acción rápida del widget para ver</string>
+    <string name="widget_bottom_sheet_instructions">Pulsación larga en navegación inferior o usa la acción rápida del Widget.</string>
     <string name="widget_pref_title">Widgets en la aplicación</string>
-    <string name="sun_moon_chart">Gráfico del sol y la luna</string>
-    <string name="pressure_chart">Gráfica de presiones</string>
+    <string name="sun_moon_chart">Gráfico Sol y Luna</string>
+    <string name="pressure_chart">Tabla de presiones</string>
     <string name="tide_chart">Gráfica de mareas</string>
-    <string name="tide_estimation_description_tide_clock">Utiliza el reloj para estimar las mareas. Requiere al menos una marea conocida.</string>
-    <string name="tide_estimation_description_lunitidal_interval_local">Utiliza la posición de la luna para estimar las mareas. Requiere el intervalo lunitidal local y la ubicación.</string>
-    <string name="tide_estimation_description_lunitidal_interval_utc">Utiliza la posición de la luna para estimar las mareas. Requiere el intervalo lunitidal UTC.</string>
-    <string name="tide_estimation_description_lunitidal_interval_auto">Utiliza la posición de la luna para estimar las mareas. Requiere al menos una marea conocida.</string>
-    <string name="tide_estimation_description_tide_model">Utiliza un modelo de mareas incorporado para estimar las mareas de la ubicación introducida o de su ubicación si no se ha introducido ninguna.</string>
+    <string name="tide_estimation_description_tide_clock">Usa el reloj para estimar las mareas. Requiere al menos una marea conocida.</string>
+    <string name="tide_estimation_description_lunitidal_interval_local">Usa la posición de la luna para estimar las mareas. Requiere el intervalo lunitidal local y la ubicación.</string>
+    <string name="tide_estimation_description_lunitidal_interval_utc">Usa la posición de la luna para estimar las mareas. Requiere el intervalo lunitidal UTC.</string>
+    <string name="tide_estimation_description_lunitidal_interval_auto">Usa la posición de la luna para estimar las mareas. Requiere al menos una marea conocida.</string>
+    <string name="tide_estimation_description_tide_model">Usa un modelo de mareas incorporado para estimar las mareas en la ubicación introducida o de tu ubicación si no se ha introducido ninguna.</string>
     <string name="tide_model_auto">Modelo de mareas (automático)</string>
     <string name="nearby_beacons">Faros cercanos</string>
     <string name="star">Estrella</string>
-    <string name="show_stars">Mostrar estrellas</string>
+    <string name="show_stars">Mostrar estrellas y planetas</string>
     <string name="approximate_location">Ubicación aproximada</string>
     <string name="last_known_gps_location">Última ubicación GPS conocida</string>
     <string name="timezone">Huso horario</string>
@@ -1247,15 +1209,15 @@
     <string name="milligrams_format">%s mg</string>
     <string name="books">Libros</string>
     <string name="africa">África</string>
-    <string name="fungus">Hongo</string>
-    <string name="bird">Ave</string>
+    <string name="fungus">Hongos</string>
+    <string name="bird">Aves</string>
     <string name="antarctica">Antártida</string>
     <string name="asia">Asia</string>
     <string name="marine">Marino</string>
     <string name="cell_towers">Torres celulares</string>
     <string name="emergency_calls_only">Solo llamadas de emergencia</string>
-    <string name="mammal">Mamífero</string>
-    <string name="reptile">Reptil</string>
+    <string name="mammal">Mamíferos</string>
+    <string name="reptile">Reptiles</string>
     <string name="rock">Roca</string>
     <string name="insect">Insecto</string>
     <string name="arachnid">Arácnido</string>
@@ -1265,7 +1227,7 @@
     <string name="freshwater">Agua dulce</string>
     <string name="edible">Comestible</string>
     <string name="delete_all_beacons">Se eliminarán todas las balizas.</string>
-    <string name="no_pages">Ninguna página</string>
+    <string name="no_pages">Sin páginas</string>
     <plurals name="page_group_summary">
         <item quantity="one">%d página</item>
         <item quantity="many">%d páginas</item>
@@ -1289,11 +1251,11 @@
     <string name="australia">Oceanía</string>
     <string name="europe">Europa</string>
     <string name="north_america">América del Norte</string>
-    <string name="plant">Planta</string>
-    <string name="animal">Animal</string>
-    <string name="amphibian">Anfibio</string>
-    <string name="fish">Pez</string>
-    <string name="invertebrate">Invertebrado</string>
+    <string name="plant">Plantas</string>
+    <string name="animal">Animales</string>
+    <string name="amphibian">Anfibios</string>
+    <string name="fish">Peces</string>
+    <string name="invertebrate">Invertebrados</string>
     <string name="mollusk">Molusco</string>
     <string name="sponge">Esponja</string>
     <string name="coral">Coral</string>
@@ -1322,7 +1284,6 @@
     <string name="stars">Estrellas</string>
     <string name="nearest_stars">Estrellas más cercanas</string>
     <string name="select_star">Seleccionar estrella</string>
-    <string name="ballistics_calculator">Calculadora balística</string>
     <string name="ballistics">Balística</string>
     <string name="permits">Permisos</string>
     <string name="no_permits">Ningún permiso</string>
@@ -1331,7 +1292,7 @@
     <string name="grains">Granos</string>
     <string name="no_results">Ningún resultado</string>
     <string name="trace">Calcar</string>
-    <string name="map_trace_instructions">Sitúese en una zona de sombra o tape el sol con un paño y coloque papel sobre la pantalla de modo que pueda ver el mapa a través del papel. Utilice un bolígrafo o un lápiz para calcar el mapa, pero evite rotuladores o bolígrafos que puedan traspasar el papel.\n\nLa navegación inferior se desactivará hasta que desactive el modo de calco.</string>
+    <string name="map_trace_instructions">Sitúate en una zona de sombra o tapa el sol con un paño y coloca papel sobre la pantalla de modo que puedas ver el mapa a través del papel. Usa un bolígrafo o un lápiz para calcar el mapa pero evita rotuladores o bolígrafos que puedan traspasar el papel.\n\nLa navegación inferior se desactivará hasta que desactives el modo de calco.</string>
     <string name="no_cell_towers_found">No se encontró ninguna torre celular</string>
     <string name="speed">Velocidad</string>
     <string name="feet_per_second">Pies por segundo</string>
@@ -1378,10 +1339,10 @@
     <string name="pref_navigation_lock_screen_when_open_title">Mostrar en pantalla de bloqueo mientras está abierto</string>
     <string name="caliber_format">%s cal</string>
     <string name="grains_format">%s gr</string>
-    <string name="survival_guide_disclaimer">Esta guía se proporciona únicamente con fines informativos, y ni el autor, ni el editor, ni ninguno de los colaboradores garantizan su exactitud o idoneidad para cualquier propósito. Al utilizar esta guía, usted reconoce que las actividades al aire libre implican riesgos, y lo hace bajo su propia responsabilidad, aceptando eximir de responsabilidad e indemnizar al autor, al editor y a cualquier colaborador por cualquier reclamación o daño derivado del uso de esta guía. Consulte siempre a profesionales para obtener asesoramiento específico para su situación, ya que esta guía no sustituye a la orientación profesional. Además, tenga en cuenta que las leyes y normativas locales pueden afectar al uso legal de las técnicas aquí descritas, y su cumplimiento es responsabilidad suya.</string>
+    <string name="survival_guide_disclaimer">Esta guía se proporciona únicamente con fines informativos. Ni el autor ni el editor ni ninguno de los colaboradores garantizan su exactitud o idoneidad para cualquier propósito. Al usar esta guía aceptas que las actividades al aire libre implican riesgos y lo haces bajo tu responsabilidad eximiendo de toda responsabilidad al autor, al editor y a cualquier colaborador por cualquier reclamación o daño derivado del uso de esta guía. Consulta siempre a profesionales para obtener asesoramiento específico para la situación ya que esta guía no sustituye a la orientación profesional. Además, ten en cuenta que las leyes y normativas locales pueden afectar al uso legal de las técnicas aquí descritas, y su cumplimiento es tu responsabilidad.</string>
     <string name="survival_guide_empty_desc">Busque por temas de supervivencia como agua, medicina, alimentos, meteorología, refugios o técnicas de desplazamiento.</string>
     <string name="signal_finder_description">Ver torres de telefonía móvil y señales cercanas.</string>
-    <string name="cell_tower_disclaimer">La ubicación de las torres es aproximada a partir de OpenCelliD.\n\n[OpenCelliD Project](https://opencellid.org/) está bajo una licencia [Creative Commons Attribution-ShareAlike 4.0 International].(https://creativecommons.org/licenses/by-sa/4.0/)</string>
+    <string name="cell_tower_disclaimer">La ubicación de las torres es aproximada a partir de OpenCelliD, Mozilla Location Service, y FCC Antenna Registrations\n\n[OpenCelliD Project](https://opencellid.org/) está bajo licencia [Creative Commons Attribution-ShareAlike 4.0 International].(https://creativecommons.org/licenses/by-sa/4.0/)</string>
     <string name="activity_pattern">Patrón de actividad</string>
     <string name="field_guide_disclaimer">Esta herramienta sólo tiene fines educativos. Tenga siempre cuidado al identificar plantas, animales u hongos. Algunas especies pueden ser peligrosas o estar protegidas. Si no está seguro de una identificación, consulte a un profesional.</string>
     <string name="distance_to_target">Distancia al objetivo</string>
@@ -1428,4 +1389,89 @@
     <string name="elevation_miss">Error de elevación</string>
     <string name="adjustment_per_click">Ajuste por clic</string>
     <string name="scope_height">Altura del alcance</string>
+    <string name="scope_adjustment">Ajustar el alcance</string>
+    <string name="sight_in_range">Distancia de puntería</string>
+    <string name="drop_amount">%s caída</string>
+    <string name="drop_header_units">Caída (%s)</string>
+    <string name="format_fpe">%s equivalente en ft·lb</string>
+    <string name="dem_url">DEM URL</string>
+    <string name="basemap">Mapa base</string>
+    <string name="show_labels">Mostrar etiquetas</string>
+    <string name="color_with_elevation">Contornos coloreados por elevación</string>
+    <string name="planet_mercury">Marcurio</string>
+    <string name="planet_venus">Venus</string>
+    <string name="planet_mars">Marte</string>
+    <string name="planet_jupiter">Júpiter</string>
+    <string name="planet_saturn">Saturno</string>
+    <string name="planet_uranus">Urano</string>
+    <string name="planet_neptune">Neptuno</string>
+    <string name="load_pdf_tiles">Cargar mosaicos PDF</string>
+    <string name="load_pdf_tiles_summary">Los mapas PDF serán más nítidos, pero el rendimiento puede verse afectado</string>
+    <string name="map_tool_disclaimer">Esta herramienta muestra tus balizas, rutas y mapas fotográficos. No sustituye a una aplicación de mapas dedicada.</string>
+    <string name="open_settings">Abrir ajustes</string>
+    <string name="show_gps_accuracy">Mostrar precisión GPS</string>
+    <string name="increase_exposure_at_night">Aumentar exposición de noche</string>
+    <string name="show_constellations">Mostrar constelaciones</string>
+    <string name="constellation">Constelación</string>
+    <string name="no_sightings">Sin avistamientos</string>
+    <string name="sighting">Avistamiento</string>
+    <string name="sleep_sound_white_noise">Ruido blanco</string>
+    <string name="sleep_sound_pink_noise">Ruido rosa</string>
+    <string name="sleep_sound_brown_noise">Ruido marrón</string>
+    <string name="sleep_sound_crickets">Grillos</string>
+    <string name="sleep_sound_crickets_no_chirping">Grillos (sin chirridos)</string>
+    <string name="sleep_sound_ocean_waves">Olas oceánicas</string>
+    <string name="sleep_sound_fan">Ventilador</string>
+    <string name="hillshade">Sombreado del terreno</string>
+    <string name="color_usgs">USGS</string>
+    <string name="color_grayscale">Escala de grises</string>
+    <string name="color_vibrant">Vibrante</string>
+    <string name="color_muted">Silenciado</string>
+    <string name="color_viridis">Viridis</string>
+    <string name="color_inferno">Inferno</string>
+    <string name="color_plasma">Plasma</string>
+    <string name="color_black">Negro</string>
+    <string name="color_brown">Marrón</string>
+    <string name="color_gray">Gris</string>
+    <string name="color_white">Blanco</string>
+    <string name="background_color">Color de fondo</string>
+    <string name="add_to_homescreen">Añadir a pantalla de inicio</string>
+    <string name="transparent">Transparencia</string>
+    <string name="battery_tip_disable_services">Desactiva los servicios que no uses.</string>
+    <string name="battery_tip_airplane_mode">Activa el modo avión para desactivar todas las conexiones inalámbricas.</string>
+    <string name="battery_tip_wifi">Desactiva el wifi cuando no estés dentro del rango de una red wifi o no necesites Internet.</string>
+    <string name="battery_tip_bluetooth">Desactiva el Bluetooth cuando no lo uses.</string>
+    <string name="battery_tip_nfc">Desactiva el NFC cuando no necesites hacer pagos sin contacto.</string>
+    <string name="battery_tip_location">Desactiva la ubicación cuando no necesites GPS.</string>
+    <string name="battery_tip_battery_saver">Activa el modo de ahorro de batería para limitar ciertas funciones del teléfono.</string>
+    <string name="battery_tip_data_saver">Activa el ahorro de datos para restringir el uso de datos móviles en segundo plano.</string>
+    <string name="battery_tip_adaptive_brightness">Activa el brillo adaptativo o baja el brillo de la pantalla.</string>
+    <string name="battery_tip_display_timeout">Reduce el tiempo hasta apagar la pantalla para cuando olvides apagarla manualmente. Desactiva el modo pantalla siempre activa.</string>
+    <string name="battery_tip_dark_theme">Activa el tema oscuro si tu dispositivo tiene pantalla OLED.</string>
+    <string name="battery_tip_background_apps">Restringe la activada en segundo plano de las apps que no necesites que se ejecuten en segundo plano.</string>
+    <string name="airplane_mode">Modo avión</string>
+    <string name="wifi">Wifi</string>
+    <string name="bluetooth">Bluetooth</string>
+    <string name="nfc">NFC</string>
+    <string name="battery_saver">Ahorro de batería</string>
+    <string name="data_saver">Ahorro de datos</string>
+    <string name="adaptive_brightness">Brillo adaptativo</string>
+    <string name="dark_theme">Tema oscuro</string>
+    <string name="restrict_app_background_activity">Restringir actividad en segundo plano</string>
+    <string name="system">Sistema</string>
+    <string name="battery_tip_system">Configurar los ajustes del sistema para reducir el uso de batería.</string>
+    <string name="other_tips">Otras sugerencias</string>
+    <string name="battery_tip_other">Apaga el dispositivo, fuerza la detención de las apps, desactiva o desinstala apps, o desactiva las actualizaciones automáticas y copias de seguridad.</string>
+    <string name="theme_transparent_type">Transparencia (%s)</string>
+    <string name="widget_theme_black_text">Texto negro</string>
+    <string name="widget_theme_white_text">Texto blanco</string>
+    <string name="default_widget_theme">Tema por defecto del widget</string>
+    <string name="screen_timeout">Tiempo hasta apagar la pantalla</string>
+    <string name="cancel_navigation_question">¿Cancelar navegación?</string>
+    <string name="elevation_value">Elevación: %s</string>
+    <string name="show_pressure_forecast">Mostrar previsión de presión en gráfico</string>
+    <string name="moa_amount">%s \' de ángulo</string>
+    <string name="mil_amount">%s mil</string>
+    <string name="uses_g1_drag_model">Usa el modelo de arrastre G1</string>
+    <string name="remember_map_state">Recordar estado del mapa</string>
 </resources>

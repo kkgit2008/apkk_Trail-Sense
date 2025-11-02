@@ -42,6 +42,7 @@ import com.kylecorry.trail_sense.shared.sensors.CustomGPS
 import com.kylecorry.trail_sense.shared.sensors.SensorService
 import com.kylecorry.trail_sense.shared.sensors.altimeter.CachedAltimeter
 import com.kylecorry.trail_sense.shared.sensors.altimeter.OverrideAltimeter
+import com.kylecorry.trail_sense.shared.sensors.gps.InactiveGPS
 import com.kylecorry.trail_sense.shared.sensors.hygrometer.MockHygrometer
 import com.kylecorry.trail_sense.shared.sensors.overrides.CachedGPS
 import com.kylecorry.trail_sense.shared.sensors.overrides.OverrideGPS
@@ -205,10 +206,11 @@ class SensorDetailsFragment : BoundFragment<FragmentSensorDetailsBinding>() {
     }
 
     private fun updateAltimeterCache() {
-        val altitude = Distance(
+        val altitude = Distance.from(
             cachedAltimeter.altitude,
             DistanceUnits.Meters
-        ).convertTo(if (prefs.distanceUnits == UserPreferences.DistanceUnits.Meters) DistanceUnits.Meters else DistanceUnits.Feet)
+        )
+            .convertTo(if (prefs.distanceUnits == UserPreferences.DistanceUnits.Meters) DistanceUnits.Meters else DistanceUnits.Feet)
 
         sensorDetailsMap["altimeter_cache"] = SensorDetails(
             getString(R.string.altimeter_cache),
@@ -220,10 +222,11 @@ class SensorDetailsFragment : BoundFragment<FragmentSensorDetailsBinding>() {
     }
 
     private fun updateAltimeter() {
-        val altitude = Distance(
+        val altitude = Distance.from(
             altimeter.altitude,
             DistanceUnits.Meters
-        ).convertTo(if (prefs.distanceUnits == UserPreferences.DistanceUnits.Meters) DistanceUnits.Meters else DistanceUnits.Feet)
+        )
+            .convertTo(if (prefs.distanceUnits == UserPreferences.DistanceUnits.Meters) DistanceUnits.Meters else DistanceUnits.Feet)
         sensorDetailsMap["altimeter"] = SensorDetails(
             getString(R.string.pref_altimeter_calibration_title),
             formatService.formatDistance(altitude),
@@ -253,7 +256,7 @@ class SensorDetailsFragment : BoundFragment<FragmentSensorDetailsBinding>() {
             return
         }
         val pressure =
-            Pressure(barometer.pressure, PressureUnits.Hpa).convertTo(prefs.pressureUnits)
+            Pressure.from(barometer.pressure, PressureUnits.Hpa).convertTo(prefs.pressureUnits)
         sensorDetailsMap["barometer"] = SensorDetails(
             getString(R.string.barometer),
             formatService.formatPressure(
@@ -297,7 +300,7 @@ class SensorDetailsFragment : BoundFragment<FragmentSensorDetailsBinding>() {
     }
 
     private fun updateThermometer() {
-        val temperature = Temperature(
+        val temperature = Temperature.from(
             thermometer.temperature,
             TemperatureUnits.C
         ).convertTo(prefs.temperatureUnits)
@@ -414,7 +417,7 @@ class SensorDetailsFragment : BoundFragment<FragmentSensorDetailsBinding>() {
             return Resources.color(requireContext(), R.color.green)
         }
 
-        if (gps is CachedGPS || !GPS.isAvailable(requireContext())) {
+        if (gps is InactiveGPS || !GPS.isAvailable(requireContext())) {
             return Resources.color(requireContext(), R.color.red)
         }
 
@@ -468,7 +471,7 @@ class SensorDetailsFragment : BoundFragment<FragmentSensorDetailsBinding>() {
             return getString(R.string.gps_user)
         }
 
-        if (gps is CachedGPS || !GPS.isAvailable(requireContext())) {
+        if (gps is InactiveGPS || !GPS.isAvailable(requireContext())) {
             return getString(R.string.unavailable)
         }
 

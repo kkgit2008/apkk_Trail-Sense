@@ -11,7 +11,6 @@ import com.kylecorry.sol.units.Distance
 import com.kylecorry.sol.units.Reading
 import com.kylecorry.sol.units.Temperature
 import com.kylecorry.trail_sense.tools.climate.infrastructure.dewpoint.HistoricMonthlyDewpointRepo
-import com.kylecorry.trail_sense.tools.climate.infrastructure.precipitation.HistoricMonthlyPrecipitationRepo
 import com.kylecorry.trail_sense.tools.climate.infrastructure.temperatures.HistoricTemperatureRepo
 import com.kylecorry.trail_sense.tools.climate.infrastructure.temperatures.ITemperatureRepo
 import java.time.LocalDate
@@ -27,7 +26,7 @@ class ClimateSubsystem private constructor(private val context: Context) : ITemp
         location: Coordinate,
         elevation: Distance
     ): Map<Month, Temperature> = onIO {
-        HistoricMonthlyDewpointRepo.getMonthlyDewpoint(context, location).mapValues {
+        HistoricMonthlyDewpointRepo.getMonthlyDewpoint(location).mapValues {
             Meteorology.getTemperatureAtElevation(it.value, Distance.meters(0f), elevation)
         }
     }
@@ -38,7 +37,7 @@ class ClimateSubsystem private constructor(private val context: Context) : ITemp
         date: LocalDate
     ): Temperature = onIO {
         val dewpoints =
-            getMonthlyDewpoints(location, elevation).mapValues { it.value.celsius().temperature }
+            getMonthlyDewpoints(location, elevation).mapValues { it.value.celsius().value }
         val interpolated = dewpointInterpolator.interpolate(date, dewpoints)
         Temperature.celsius(interpolated)
     }
@@ -51,12 +50,6 @@ class ClimateSubsystem private constructor(private val context: Context) : ITemp
         Time.getYearlyValues(year) {
             getDewpoint(location, elevation, it)
         }
-    }
-
-    suspend fun getMonthlyPrecipitation(
-        location: Coordinate
-    ): Map<Month, Distance> = onIO {
-        HistoricMonthlyPrecipitationRepo.getMonthlyPrecipitation(context, location)
     }
 
     override suspend fun getYearlyTemperatures(

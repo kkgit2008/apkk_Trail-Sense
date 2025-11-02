@@ -11,19 +11,20 @@ import com.kylecorry.sol.units.Speed
 import com.kylecorry.sol.units.TimeUnits
 import com.kylecorry.trail_sense.shared.UserPreferences
 import com.kylecorry.trail_sense.shared.sensors.IntervalSensor
+import com.kylecorry.trail_sense.shared.sensors.gps.InactiveGPS
 import java.time.Duration
 import java.time.Instant
 
 class OverrideGPS(context: Context, updateFrequency: Long = 20L) :
     IntervalSensor(Duration.ofMillis(updateFrequency)),
-    ISatelliteGPS {
+    ISatelliteGPS, InactiveGPS {
 
     private val userPrefs by lazy { UserPreferences(context) }
 
     override val location: Coordinate
         get() = userPrefs.locationOverride
     override val speed: Speed
-        get() = Speed(0f, DistanceUnits.Meters, TimeUnits.Seconds)
+        get() = Speed.from(0f, DistanceUnits.Meters, TimeUnits.Seconds)
     override val speedAccuracy: Float?
         get() = null
     override val time: Instant

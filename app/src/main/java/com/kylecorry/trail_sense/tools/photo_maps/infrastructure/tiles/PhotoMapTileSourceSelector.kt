@@ -1,10 +1,10 @@
 package com.kylecorry.trail_sense.tools.photo_maps.infrastructure.tiles
 
 import android.content.Context
+import com.kylecorry.andromeda.bitmaps.operations.BitmapOperation
 import com.kylecorry.sol.math.SolMath
 import com.kylecorry.sol.science.geology.CoordinateBounds
 import com.kylecorry.trail_sense.shared.andromeda_temp.intersects2
-import com.kylecorry.trail_sense.shared.bitmaps.BitmapOperation
 import com.kylecorry.trail_sense.shared.map_layers.tiles.IGeographicImageRegionLoader
 import com.kylecorry.trail_sense.shared.map_layers.tiles.ITileSourceSelector
 import com.kylecorry.trail_sense.tools.photo_maps.domain.PhotoMap
@@ -19,21 +19,21 @@ class PhotoMapTileSourceSelector(
 ) : ITileSourceSelector {
 
     private val sortedMaps = maps
-        .filter { it.isCalibrated && it.visible }
+        .filter { it.isCalibrated }
         .sortedBy { it.distancePerPixel() }
 
     // TODO: Factor in rotation by using projection to see if the bounds intersect/are contained
     override fun getRegionLoaders(bounds: CoordinateBounds): List<IGeographicImageRegionLoader> {
-        val minArea = bounds.width().meters().distance.toDouble() * bounds.height()
-            .meters().distance.toDouble() * 0.25
+        val minArea = bounds.width().meters().value.toDouble() * bounds.height()
+            .meters().value.toDouble() * 0.25
 
         val possibleMaps = sortedMaps.filter {
             val boundary = it.boundary() ?: return@filter false
             if (boundary == CoordinateBounds.world) {
                 return@filter true
             }
-            val area = boundary.width().meters().distance.toDouble() *
-                    boundary.height().meters().distance.toDouble()
+            val area = boundary.width().meters().value.toDouble() *
+                    boundary.height().meters().value.toDouble()
             area >= minArea
         }
 

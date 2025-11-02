@@ -1096,7 +1096,7 @@
     <string name="north_america">Nord-Amerika</string>
     <string name="south_america">Sør-Amerika</string>
     <string name="cell_towers">Mobilmaster</string>
-    <string name="cell_tower_disclaimer">Mobilmastenes plassering er beregnet ut fra OpenCelliD.\n\n[OpenCelliD Project](https://opencellid.org/) er lisensiert under en [Creative Commons Attribution-ShareAlike 4.0 International License](https://creativecommons.org/licenses/by-sa/4.0/)</string>
+    <string name="cell_tower_disclaimer">Mobilmastenes plassering er beregnet ut fra OpenCelliD, Mozilla Location Service og FCC Antenna Registrations.\n\n[OpenCelliD Project](https://opencellid.org/) er lisensiert under en [Creative Commons Attribution-ShareAlike 4.0 International License](https://creativecommons.org/licenses/by-sa/4.0/)</string>
     <string name="cell_tower">Mobilmast</string>
     <string name="no_results">Ingen resultater</string>
     <string name="pref_navigation_lock_screen_when_open_title">Vis på låseskjermen når åpen</string>
@@ -1149,7 +1149,6 @@
     <string name="energy">Energi</string>
     <string name="milligrams">Milligram</string>
     <string name="milligrams_format">%s mg</string>
-    <string name="ballistics_calculator">Ballistikk-kalkulator</string>
     <string name="screen_flashlight_full_name">Skjermlommelykt</string>
     <string name="bottom_navigation_slot">Nedre navigeringsplass %d</string>
     <string name="pinned">Festet</string>
@@ -1223,4 +1222,15 @@
     <string name="planet_uranus">Uranus</string>
     <string name="open_settings">Åpne innstillinger</string>
     <string name="show_gps_accuracy">Vis GPS-nøyaktiget</string>
+    <string name="field_guide">Feltguide</string>
+    <string name="show_constellations">Vis stjernebilder</string>
+    <string name="constellation">Stjernebilde</string>
+    <string name="sleep_sound_ocean_waves">Havbølger</string>
+    <string name="hillshade">Relieffskygge</string>
+    <string name="color_white">Hvit</string>
+    <string name="background_color">Bakgrunnsfarge</string>
+    <string name="color_black">Svart</string>
+    <string name="color_brown">Brun</string>
+    <string name="color_gray">Grå</string>
+    <string name="airplane_mode">Flymodus</string>
 </resources>

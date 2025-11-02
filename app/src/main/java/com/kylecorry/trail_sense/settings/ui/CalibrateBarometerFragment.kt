@@ -12,7 +12,6 @@ import com.kylecorry.andromeda.core.time.CoroutineTimer
 import com.kylecorry.andromeda.core.time.Throttle
 import com.kylecorry.andromeda.fragments.AndromedaPreferenceFragment
 import com.kylecorry.andromeda.fragments.inBackground
-import com.kylecorry.andromeda.fragments.observe
 import com.kylecorry.luna.coroutines.CoroutineQueueRunner
 import com.kylecorry.sol.units.Pressure
 import com.kylecorry.sol.units.PressureUnits
@@ -22,6 +21,7 @@ import com.kylecorry.trail_sense.shared.CustomUiUtils
 import com.kylecorry.trail_sense.shared.FormatService
 import com.kylecorry.trail_sense.shared.Units
 import com.kylecorry.trail_sense.shared.UserPreferences
+import com.kylecorry.trail_sense.shared.andromeda_temp.observe
 import com.kylecorry.trail_sense.shared.sensors.SensorService
 import com.kylecorry.trail_sense.tools.weather.domain.RawWeatherObservation
 import com.kylecorry.trail_sense.tools.weather.domain.WeatherObservation
@@ -78,13 +78,18 @@ class CalibrateBarometerFragment : AndromedaPreferenceFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         observe(weatherSubsystem.weatherChanged) {
-            inBackground {
-                runner.replace {
-                    history = weatherSubsystem.getHistory()
-                    uncalibratedHistory = weatherSubsystem.getRawHistory(true)
-                    onMain {
-                        updateChart()
-                    }
+            updateBarometerData()
+        }
+        updateBarometerData()
+    }
+
+    private fun updateBarometerData() {
+        inBackground {
+            runner.replace {
+                history = weatherSubsystem.getHistory()
+                uncalibratedHistory = weatherSubsystem.getRawHistory(true)
+                onMain {
+                    updateChart()
                 }
             }
         }
@@ -132,9 +137,9 @@ class CalibrateBarometerFragment : AndromedaPreferenceFragment() {
                 }
 
                 val currentOffset = prefs.weather.barometerOffset
-                val currentReading = getCurrentPressure().pressure
+                val currentReading = getCurrentPressure().value
                 val rawReading = currentReading - currentOffset
-                val newOffset = it.hpa().pressure - rawReading
+                val newOffset = it.hpa().value - rawReading
 
                 prefs.weather.barometerOffset = newOffset
 
@@ -219,7 +224,7 @@ class CalibrateBarometerFragment : AndromedaPreferenceFragment() {
             )
 
         // Disable the offset preference until there's a reading
-        preference(R.string.pref_holder_barometer_offset)?.isEnabled = pressure.pressure != 0f
+        preference(R.string.pref_holder_barometer_offset)?.isEnabled = pressure.value != 0f
     }
 
     private fun getCurrentPressure(): Pressure {

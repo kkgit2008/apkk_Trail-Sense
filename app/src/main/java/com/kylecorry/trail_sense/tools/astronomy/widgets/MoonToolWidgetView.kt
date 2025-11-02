@@ -8,19 +8,20 @@ import android.widget.RemoteViews
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.widget.RemoteViewsCompat.setViewRotation
 import com.kylecorry.andromeda.core.system.Resources
+import com.kylecorry.andromeda.views.remote.setImageViewResourceAsIcon
 import com.kylecorry.trail_sense.R
 import com.kylecorry.trail_sense.shared.FormatService
-import com.kylecorry.trail_sense.shared.extensions.setImageViewResourceAsIcon
 import com.kylecorry.trail_sense.shared.navigation.NavigationUtils
 import com.kylecorry.trail_sense.tools.astronomy.domain.AstronomySubsystem
 import com.kylecorry.trail_sense.tools.astronomy.ui.MoonPhaseImageMapper
 import com.kylecorry.trail_sense.tools.tools.infrastructure.Tools
 import com.kylecorry.trail_sense.tools.tools.ui.widgets.SimpleToolWidgetView
+import com.kylecorry.trail_sense.tools.tools.widgets.WidgetPreferences
 
 class MoonToolWidgetView : SimpleToolWidgetView() {
 
-    override suspend fun getPopulatedView(context: Context): RemoteViews {
-        val views = getView(context)
+    override suspend fun getPopulatedView(context: Context, prefs: WidgetPreferences?): RemoteViews {
+        val views = getView(context, prefs)
         val astronomy = AstronomySubsystem.getInstance(context)
         val formatter = FormatService.getInstance(context)
         val moon = astronomy.moon

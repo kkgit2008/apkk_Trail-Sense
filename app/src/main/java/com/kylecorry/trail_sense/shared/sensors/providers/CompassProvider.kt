@@ -35,7 +35,7 @@ import kotlin.math.pow
 
 class CompassProvider(private val context: Context, private val prefs: ICompassPreferences) {
 
-    fun get(sensorDelay: Int): ICompass {
+    fun get(sensorDelay: Int, existingOrientationSensor: IOrientationSensor? = null): ICompass {
         val useTrueNorth = prefs.useTrueNorth
 
         var source = prefs.source
@@ -62,7 +62,7 @@ class CompassProvider(private val context: Context, private val prefs: ICompassP
 
             else -> {
                 Compass(
-                    getOrientationSensor(sensorDelay),
+                    existingOrientationSensor ?: getOrientationSensor(sensorDelay),
                     useTrueNorth,
                     surfaceRotation = Surface.ROTATION_90,
                     offset = -90f
@@ -201,14 +201,14 @@ class CompassProvider(private val context: Context, private val prefs: ICompassP
         fun getAvailableSources(context: Context): List<CompassSource> {
             val sources = mutableListOf<CompassSource>()
 
-            if (Sensors.hasSensor(context, Sensor.TYPE_ROTATION_VECTOR)) {
-                sources.add(CompassSource.RotationVector)
-            }
-
             if (Sensors.hasSensor(context, Sensor.TYPE_GYROSCOPE) &&
                 Sensors.hasSensor(context, Sensor.TYPE_MAGNETIC_FIELD)
             ) {
                 sources.add(CompassSource.CustomRotationVector)
+            }
+
+            if (Sensors.hasSensor(context, Sensor.TYPE_ROTATION_VECTOR)) {
+                sources.add(CompassSource.RotationVector)
             }
 
             if (Sensors.hasSensor(context, Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR)) {

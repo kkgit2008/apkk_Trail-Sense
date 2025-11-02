@@ -14,6 +14,8 @@ import com.kylecorry.andromeda.core.system.GeoUri
 import com.kylecorry.andromeda.core.system.Resources
 import com.kylecorry.andromeda.core.ui.setCompoundDrawables
 import com.kylecorry.andromeda.fragments.BoundFragment
+import com.kylecorry.andromeda.preferences.putOrRemoveCoordinate
+import com.kylecorry.andromeda.preferences.putOrRemoveFloat
 import com.kylecorry.sol.science.geology.CoordinateBounds
 import com.kylecorry.sol.science.geology.Geofence
 import com.kylecorry.sol.science.geology.Geology
@@ -31,8 +33,7 @@ import com.kylecorry.trail_sense.shared.Units
 import com.kylecorry.trail_sense.shared.UserPreferences
 import com.kylecorry.trail_sense.shared.colors.AppColor
 import com.kylecorry.trail_sense.shared.extensions.from
-import com.kylecorry.trail_sense.shared.extensions.putOrRemoveCoordinate
-import com.kylecorry.trail_sense.shared.extensions.putOrRemoveFloat
+import com.kylecorry.trail_sense.shared.map_layers.ui.layers.ScaleBarLayer
 import com.kylecorry.trail_sense.shared.navigation.NavControllerAppNavigation
 import com.kylecorry.trail_sense.shared.preferences.PreferencesSubsystem
 import com.kylecorry.trail_sense.shared.sharing.Share
@@ -59,6 +60,7 @@ class FragmentToolTriangulate : BoundFragment<FragmentToolTriangulateBinding>() 
 
     private val beaconLayer = BeaconLayer(showLabels = true)
     private val pathLayer = PathLayer()
+    private val scaleBarLayer = ScaleBarLayer()
 
     private val radius = Distance.meters(100f)
 
@@ -139,7 +141,8 @@ class FragmentToolTriangulate : BoundFragment<FragmentToolTriangulateBinding>() 
         // TODO: Display the distance to the location in the title
         beaconLayer.setOutlineColor(Color.WHITE)
         pathLayer.setShouldRenderWithDrawLines(true)
-        binding.map.setLayers(listOf(pathLayer, beaconLayer))
+        scaleBarLayer.units = prefs.baseDistanceUnits
+        binding.map.setLayers(listOf(pathLayer, beaconLayer, scaleBarLayer))
 
         binding.resetBtn.setOnClickListener {
             reset()
@@ -164,9 +167,7 @@ class FragmentToolTriangulate : BoundFragment<FragmentToolTriangulateBinding>() 
 
         val bounds = CoordinateBounds.from(fences)
 
-        binding.map.bounds = bounds
-        binding.map.isInteractive = true
-        binding.map.recenter()
+        binding.map.fitIntoView(bounds)
 
         // Show the locations on the map
         beaconLayer.setBeacons(listOfNotNull(
@@ -296,7 +297,7 @@ class FragmentToolTriangulate : BoundFragment<FragmentToolTriangulateBinding>() 
 
         val end = if (start != null && direction != null) {
             val declination = if (trueNorth) 0f else Geology.getGeomagneticDeclination(start)
-            val bearing = Bearing(direction).withDeclination(declination)
+            val bearing = Bearing.from(direction).withDeclination(declination)
             destination ?: start.plus(
                 Distance.kilometers(1f),
                 if (shouldCalculateMyLocation) bearing.inverse() else bearing
@@ -359,8 +360,8 @@ class FragmentToolTriangulate : BoundFragment<FragmentToolTriangulateBinding>() 
             if (binding.bearing1.trueNorth) 0f else Geology.getGeomagneticDeclination(location1)
         val declination2 =
             if (binding.bearing2.trueNorth) 0f else Geology.getGeomagneticDeclination(location2)
-        val bearing1 = Bearing(direction1).withDeclination(declination1)
-        val bearing2 = Bearing(direction2).withDeclination(declination2)
+        val bearing1 = Bearing.from(direction1).withDeclination(declination1)
+        val bearing2 = Bearing.from(direction2).withDeclination(declination2)
 
         val location = if (shouldCalculateMyLocation) {
             Geology.triangulateSelf(location1, bearing1, location2, bearing2)

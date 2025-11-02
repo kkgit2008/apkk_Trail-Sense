@@ -15,7 +15,6 @@ import com.kylecorry.andromeda.core.toFloatCompat
 import com.kylecorry.andromeda.core.topics.generic.asLiveData
 import com.kylecorry.andromeda.fragments.AndromedaPreferenceFragment
 import com.kylecorry.andromeda.fragments.inBackground
-import com.kylecorry.andromeda.fragments.observe
 import com.kylecorry.luna.coroutines.CoroutineQueueRunner
 import com.kylecorry.sol.units.Reading
 import com.kylecorry.sol.units.Temperature
@@ -25,6 +24,7 @@ import com.kylecorry.trail_sense.shared.ErrorBannerReason
 import com.kylecorry.trail_sense.shared.FormatService
 import com.kylecorry.trail_sense.shared.UserPreferences
 import com.kylecorry.trail_sense.shared.alerts.AlertLoadingIndicator
+import com.kylecorry.trail_sense.shared.andromeda_temp.observe
 import com.kylecorry.trail_sense.shared.preferences.PreferencesSubsystem
 import com.kylecorry.trail_sense.shared.requireMainActivity
 import com.kylecorry.trail_sense.shared.safeRoundToInt
@@ -103,25 +103,25 @@ class ThermometerSettingsFragment : AndromedaPreferenceFragment() {
             minTempCalibratedC?.setOnPreferenceChangeListener { _, newValue ->
                 val temp = (newValue as String).toFloatCompat() ?: 0f
                 prefs.thermometer.minActualTemperatureF =
-                    Temperature(temp, TemperatureUnits.C).convertTo(TemperatureUnits.F).temperature
+                    Temperature.from(temp, TemperatureUnits.C).convertTo(TemperatureUnits.F).value
                 true
             }
             minTempUncalibratedC?.setOnPreferenceChangeListener { _, newValue ->
                 val temp = (newValue as String).toFloatCompat() ?: 0f
                 prefs.thermometer.minBatteryTemperatureF =
-                    Temperature(temp, TemperatureUnits.C).convertTo(TemperatureUnits.F).temperature
+                    Temperature.from(temp, TemperatureUnits.C).convertTo(TemperatureUnits.F).value
                 true
             }
             maxTempCalibratedC?.setOnPreferenceChangeListener { _, newValue ->
                 val temp = (newValue as String).toFloatCompat() ?: 0f
                 prefs.thermometer.maxActualTemperatureF =
-                    Temperature(temp, TemperatureUnits.C).convertTo(TemperatureUnits.F).temperature
+                    Temperature.from(temp, TemperatureUnits.C).convertTo(TemperatureUnits.F).value
                 true
             }
             maxTempUncalibratedC?.setOnPreferenceChangeListener { _, newValue ->
                 val temp = (newValue as String).toFloatCompat() ?: 0f
                 prefs.thermometer.maxBatteryTemperatureF =
-                    Temperature(temp, TemperatureUnits.C).convertTo(TemperatureUnits.F).temperature
+                    Temperature.from(temp, TemperatureUnits.C).convertTo(TemperatureUnits.F).value
                 true
             }
         } else {
@@ -132,25 +132,25 @@ class ThermometerSettingsFragment : AndromedaPreferenceFragment() {
             minTempCalibratedF?.setOnPreferenceChangeListener { _, newValue ->
                 val temp = (newValue as String).toFloatCompat() ?: 0f
                 prefs.thermometer.minActualTemperature =
-                    Temperature(temp, TemperatureUnits.F).celsius().temperature
+                    Temperature.from(temp, TemperatureUnits.F).celsius().value
                 true
             }
             minTempUncalibratedF?.setOnPreferenceChangeListener { _, newValue ->
                 val temp = (newValue as String).toFloatCompat() ?: 0f
                 prefs.thermometer.minBatteryTemperature =
-                    Temperature(temp, TemperatureUnits.F).celsius().temperature
+                    Temperature.from(temp, TemperatureUnits.F).celsius().value
                 true
             }
             maxTempCalibratedF?.setOnPreferenceChangeListener { _, newValue ->
                 val temp = (newValue as String).toFloatCompat() ?: 0f
                 prefs.thermometer.maxActualTemperature =
-                    Temperature(temp, TemperatureUnits.F).celsius().temperature
+                    Temperature.from(temp, TemperatureUnits.F).celsius().value
                 true
             }
             maxTempUncalibratedF?.setOnPreferenceChangeListener { _, newValue ->
                 val temp = (newValue as String).toFloatCompat() ?: 0f
                 prefs.thermometer.maxBatteryTemperature =
-                    Temperature(temp, TemperatureUnits.F).celsius().temperature
+                    Temperature.from(temp, TemperatureUnits.F).celsius().value
                 true
             }
         }
@@ -203,13 +203,18 @@ class ThermometerSettingsFragment : AndromedaPreferenceFragment() {
             }
 
         observe(weather.weatherChanged) {
-            inBackground {
-                runner.replace {
-                    history = weather.getHistory()
-                    uncalibratedHistory = weather.getRawHistory()
-                    onMain {
-                        updateChart()
-                    }
+            updateData()
+        }
+        updateData()
+    }
+
+    private fun updateData() {
+        inBackground {
+            runner.replace {
+                history = weather.getHistory()
+                uncalibratedHistory = weather.getRawHistory()
+                onMain {
+                    updateChart()
                 }
             }
         }
@@ -225,7 +230,7 @@ class ThermometerSettingsFragment : AndromedaPreferenceFragment() {
             ) <= prefs.weather.pressureHistory
         }.map {
             Reading(
-                it.temperature.convertTo(temperatureUnits).temperature, it.time
+                it.temperature.convertTo(temperatureUnits).value, it.time
             )
         }
 
@@ -236,7 +241,7 @@ class ThermometerSettingsFragment : AndromedaPreferenceFragment() {
             ) <= prefs.weather.pressureHistory
         }.map {
             Reading(
-                Temperature.celsius(it.value.temperature).convertTo(temperatureUnits).temperature,
+                Temperature.celsius(it.value.temperature).convertTo(temperatureUnits).value,
                 it.time
             )
         }
@@ -305,7 +310,7 @@ class ThermometerSettingsFragment : AndromedaPreferenceFragment() {
         val temperature = calibratedThermometer?.temperature ?: return true
         temperatureTxt?.summary =
             formatService.formatTemperature(
-                Temperature(
+                Temperature.from(
                     temperature,
                     TemperatureUnits.C
                 ).convertTo(prefs.temperatureUnits)

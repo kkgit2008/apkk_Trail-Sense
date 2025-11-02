@@ -13,5 +13,4 @@ class CellSignalPreferences(private val context: Context) {
         context.getString(R.string.pref_cell_signal_refresh_cache),
         true
     )
-
 }

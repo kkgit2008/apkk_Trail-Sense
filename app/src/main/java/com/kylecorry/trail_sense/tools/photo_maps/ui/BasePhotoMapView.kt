@@ -3,6 +3,7 @@ package com.kylecorry.trail_sense.tools.photo_maps.ui
 import android.content.Context
 import android.graphics.PointF
 import android.util.AttributeSet
+import com.kylecorry.andromeda.canvas.withLayerOpacity
 import com.kylecorry.andromeda.core.system.Resources
 import com.kylecorry.andromeda.core.units.PixelCoordinate
 import com.kylecorry.sol.math.SolMath
@@ -11,7 +12,6 @@ import com.kylecorry.sol.science.geography.projections.IMapProjection
 import com.kylecorry.sol.science.geology.CoordinateBounds
 import com.kylecorry.sol.units.Coordinate
 import com.kylecorry.trail_sense.R
-import com.kylecorry.trail_sense.shared.andromeda_temp.withLayerOpacity
 import com.kylecorry.trail_sense.shared.io.FileSubsystem
 import com.kylecorry.trail_sense.shared.map_layers.ui.layers.ILayer
 import com.kylecorry.trail_sense.shared.map_layers.ui.layers.IMapView
@@ -203,7 +203,7 @@ abstract class BasePhotoMapView : EnhancedImageView, IMapView {
         this.map = map
         val rotation = map.calibration.rotation
         mapRotation = SolMath.deltaAngle(rotation, map.baseRotation().toFloat())
-        fullMetersPerPixel = map.distancePerPixel()?.meters()?.distance ?: 1f
+        fullMetersPerPixel = map.distancePerPixel()?.meters()?.value ?: 1f
         projection = map.baseProjection
         if (keepMapUp) {
             mapAzimuth = 0f

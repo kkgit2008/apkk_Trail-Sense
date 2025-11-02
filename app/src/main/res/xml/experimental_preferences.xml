@@ -35,14 +35,6 @@
             app:title="@string/tool_cliff_height_title" />
 
         <SwitchPreferenceCompat
-            android:title="@string/ballistics_calculator"
-            app:defaultValue="false"
-            app:iconSpaceReserved="false"
-            app:key="@string/pref_ballistics_calculator_enabled"
-            app:singleLineTitle="false"
-            app:summary="@string/ballistics" />
-
-        <SwitchPreferenceCompat
             android:title="@string/insect_activity"
             app:defaultValue="false"
             app:iconSpaceReserved="false"
@@ -65,6 +57,14 @@
             app:singleLineTitle="false"
             app:title="@string/forecast_algorithm"
             app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreferenceCompat
+            app:defaultValue="false"
+            app:iconSpaceReserved="false"
+            app:key="@string/pref_show_pressure_forecast"
+            app:singleLineTitle="false"
+            app:summary="@string/weather"
+            app:title="@string/show_pressure_forecast" />
 
         <ListPreference
             app:defaultValue="1"

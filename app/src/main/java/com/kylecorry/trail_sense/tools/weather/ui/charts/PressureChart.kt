@@ -39,6 +39,12 @@ class PressureChart(
         AppColor.Gray.color.withAlpha(50)
     )
 
+    // TODO: Dotted line
+    private val forecastLine = LineChartLayer(
+        emptyList(),
+        AppColor.Gray.color.withAlpha(50)
+    )
+
     private val line = LineChartLayer(
         emptyList(),
         color
@@ -69,7 +75,7 @@ class PressureChart(
 
         chart.setShouldRerenderEveryCycle(false)
 
-        chart.plot(rawLine, line, highlight)
+        chart.plot(rawLine, forecastLine, line, highlight)
     }
 
     private fun onClick(value: Vector2): Boolean {
@@ -85,22 +91,27 @@ class PressureChart(
     }
 
     private fun setUnits(units: PressureUnits) {
-        minRange = Pressure.hpa(MIN_RANGE).convertTo(units).pressure
+        minRange = Pressure.hpa(MIN_RANGE).convertTo(units).value
         precision = (Units.getDecimalPlaces(units) - 1).coerceAtLeast(0)
-        margin = Pressure.hpa(1f).convertTo(units).pressure.roundPlaces(2)
+        margin = Pressure.hpa(1f).convertTo(units).value.roundPlaces(2)
     }
 
     fun plot(
         data: List<Reading<Pressure>>,
-        raw: List<Reading<Pressure>>? = null
+        raw: List<Reading<Pressure>>? = null,
+        forecast: List<Reading<Pressure>> = emptyList()
     ) {
         startTime = data.firstOrNull()?.time ?: Instant.now()
         setUnits(data.firstOrNull()?.value?.units ?: PressureUnits.Hpa)
         val values = Chart.getDataFromReadings(data, startTime) {
-            it.pressure
+            it.value
         }
 
-        val range = Chart.getYRange(values, margin, minRange)
+        val forecastValues = Chart.getDataFromReadings(forecast, startTime) {
+            it.value
+        }
+
+        val range = Chart.getYRange(values + forecastValues, margin, minRange)
         // TODO: Support minimum range
         chart.configureYAxis(
             minimum = range.start,
@@ -112,13 +123,16 @@ class PressureChart(
 
         if (raw != null) {
             rawLine.data = Chart.getDataFromReadings(raw, startTime) {
-                it.pressure
+                it.value
             }
         } else {
             rawLine.data = emptyList()
         }
 
         line.data = values
+
+        forecastLine.data = forecastValues
+
         chart.invalidate()
     }
 

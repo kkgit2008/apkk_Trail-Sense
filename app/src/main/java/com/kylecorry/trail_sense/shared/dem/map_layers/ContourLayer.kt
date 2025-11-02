@@ -9,13 +9,12 @@ import com.kylecorry.sol.math.SolMath
 import com.kylecorry.sol.units.Distance
 import com.kylecorry.trail_sense.main.errors.SafeMode
 import com.kylecorry.trail_sense.shared.UserPreferences
-import com.kylecorry.trail_sense.shared.andromeda_temp.withLayerOpacity
-import com.kylecorry.trail_sense.shared.map_layers.MapLayerBackgroundTask
 import com.kylecorry.trail_sense.shared.dem.Contour
 import com.kylecorry.trail_sense.shared.dem.DEM
 import com.kylecorry.trail_sense.shared.dem.colors.ElevationColorMap
 import com.kylecorry.trail_sense.shared.dem.colors.ElevationColorMapFactory
 import com.kylecorry.trail_sense.shared.dem.colors.TrailSenseVibrantElevationColorMap
+import com.kylecorry.trail_sense.shared.map_layers.MapLayerBackgroundTask
 import com.kylecorry.trail_sense.shared.map_layers.tiles.TileMath
 import com.kylecorry.trail_sense.shared.map_layers.ui.layers.IAsyncLayer
 import com.kylecorry.trail_sense.shared.map_layers.ui.layers.IMapView
@@ -49,7 +48,7 @@ class ContourLayer(private val taskRunner: MapLayerBackgroundTask = MapLayerBack
             pathLayer.setPaths(contours.flatMap { level ->
                 val isImportantLine = SolMath.isZero((level.elevation / contourInterval) % 5, 0.1f)
                 val name = DecimalFormatter.format(
-                    Distance.Companion.meters(level.elevation).convertTo(units).distance, 0
+                    Distance.Companion.meters(level.elevation).convertTo(units).value, 0
                 )
                 val color = colorScale.getElevationColor(level.elevation)
                 level.lines.map { line ->
@@ -109,13 +108,13 @@ class ContourLayer(private val taskRunner: MapLayerBackgroundTask = MapLayerBack
             )
         } else {
             mapOf(
-                13 to Distance.Companion.feet(200f).meters().distance,
-                14 to Distance.Companion.feet(200f).meters().distance,
-                15 to Distance.Companion.feet(200f).meters().distance,
-                16 to Distance.Companion.feet(40f).meters().distance,
-                17 to Distance.Companion.feet(40f).meters().distance,
-                18 to Distance.Companion.feet(40f).meters().distance,
-                19 to Distance.Companion.feet(40f).meters().distance
+                13 to Distance.Companion.feet(200f).meters().value,
+                14 to Distance.Companion.feet(200f).meters().value,
+                15 to Distance.Companion.feet(200f).meters().value,
+                16 to Distance.Companion.feet(40f).meters().value,
+                17 to Distance.Companion.feet(40f).meters().value,
+                18 to Distance.Companion.feet(40f).meters().value,
+                19 to Distance.Companion.feet(40f).meters().value
             )
         }
     }
@@ -148,11 +147,7 @@ class ContourLayer(private val taskRunner: MapLayerBackgroundTask = MapLayerBack
         }
 
         taskRunner.scheduleUpdate(map.mapBounds, map.metersPerPixel)
-
-        drawer.withLayerOpacity(opacity) {
-            pathLayer.draw(drawer, map)
-        }
-
+        pathLayer.draw(drawer, map)
     }
 
     override fun drawOverlay(

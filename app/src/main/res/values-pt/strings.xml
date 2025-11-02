@@ -1355,7 +1355,6 @@
     <string name="bullet_weight">Peso do projétil</string>
     <string name="format_joules">%s joules</string>
     <string name="format_fpe">%s lb-ft</string>
-    <string name="ballistics_calculator">Calculadora balística</string>
     <string name="permits">Licenças</string>
     <string name="no_permits">Sem licenças</string>
     <string name="trace">Rotas</string>

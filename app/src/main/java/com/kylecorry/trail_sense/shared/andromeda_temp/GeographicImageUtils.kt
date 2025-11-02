@@ -18,7 +18,7 @@ import kotlin.math.roundToInt
 
 object GeographicImageUtils {
 
-    // TODO: Extract to andromeda (nearest pixel meeting a criteria within a region - maybe just update the ImageSource with a nearest non-zero pixel option)
+    // TODO: Redo this
     suspend fun getNearestPixelOfAsset(
         source: GeographicImageSource,
         context: Context,
@@ -26,10 +26,10 @@ object GeographicImageUtils {
         imagePath: String,
         searchSize: Int = 5,
         hasValue: (Int) -> Boolean = { it.red > 0 || it.green > 0 || it.blue > 0 },
-        hasMappedValue: (List<Float>) -> Boolean = { it.dropLast(1).any { it > 0 } },
+        hasMappedValue: (FloatArray) -> Boolean = { it.dropLast(1).any { it > 0 } },
     ): PixelCoordinate? {
         val actualPixel = source.getPixel(location)
-        val sourceValue = source.read(context, imagePath, actualPixel)
+        val sourceValue = source.read(actualPixel)
         if (hasMappedValue(sourceValue)) {
             return actualPixel
         }

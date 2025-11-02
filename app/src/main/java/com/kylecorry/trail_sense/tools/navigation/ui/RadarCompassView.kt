@@ -12,6 +12,7 @@ import androidx.core.view.isVisible
 import com.kylecorry.andromeda.canvas.ArcMode
 import com.kylecorry.andromeda.canvas.ImageMode
 import com.kylecorry.andromeda.canvas.TextMode
+import com.kylecorry.andromeda.canvas.withLayerOpacity
 import com.kylecorry.andromeda.core.system.Resources
 import com.kylecorry.andromeda.core.tryOrLog
 import com.kylecorry.andromeda.core.units.PixelCoordinate
@@ -21,7 +22,6 @@ import com.kylecorry.sol.math.Vector2
 import com.kylecorry.sol.math.geometry.Circle
 import com.kylecorry.sol.science.geology.CoordinateBounds
 import com.kylecorry.sol.science.geology.Geofence
-import com.kylecorry.sol.units.Bearing
 import com.kylecorry.sol.units.Coordinate
 import com.kylecorry.sol.units.Distance
 import com.kylecorry.trail_sense.R
@@ -29,7 +29,6 @@ import com.kylecorry.trail_sense.shared.CustomUiUtils.getCardinalDirectionColor
 import com.kylecorry.trail_sense.shared.DistanceUtils.toRelativeDistance
 import com.kylecorry.trail_sense.shared.FormatService
 import com.kylecorry.trail_sense.shared.Units
-import com.kylecorry.trail_sense.shared.andromeda_temp.withLayerOpacity
 import com.kylecorry.trail_sense.shared.map_layers.ui.layers.ILayer
 import com.kylecorry.trail_sense.shared.map_layers.ui.layers.IMapView
 import com.kylecorry.trail_sense.tools.navigation.domain.NavigationService
@@ -59,8 +58,8 @@ class RadarCompassView : BaseCompassView, IMapView {
     private var cardinalSize = 0f
     private var locationStrokeWeight = 0f
 
-    private lateinit var maxDistanceBaseUnits: Distance
-    private lateinit var maxDistanceMeters: Distance
+    private var maxDistanceBaseUnits: Distance = Distance.meters(0f)
+    private var maxDistanceMeters: Distance = Distance.meters(0f)
 
     private val navigation = NavigationService()
 
@@ -134,7 +133,7 @@ class RadarCompassView : BaseCompassView, IMapView {
         opacity(30)
         strokeWeight(3f)
         push()
-        rotate(azimuth.value)
+        rotate(azimuth)
         if (shouldDrawDial) {
             line(width / 2f, height / 2f, width / 2f, iconSize + dp(2f))
         }
@@ -236,7 +235,7 @@ class RadarCompassView : BaseCompassView, IMapView {
         }
         clear()
         push()
-        rotate(-azimuth.value)
+        rotate(-azimuth)
         dial.draw(drawer, false)
         drawLayers()
         drawCompassLayers()
@@ -259,7 +258,7 @@ class RadarCompassView : BaseCompassView, IMapView {
         }
         opacity((255 * reference.opacity).toInt())
         push()
-        rotate(reference.bearing.value)
+        rotate(reference.bearing)
         val bitmap = getBitmap(reference.drawableId, sizeDp)
         push()
         translate(width / 2f - sizeDp / 2f, (iconSize - sizeDp) * 0.6f)
@@ -284,8 +283,8 @@ class RadarCompassView : BaseCompassView, IMapView {
             iconSize.toFloat() + dp2,
             compassSize.toFloat(),
             compassSize.toFloat(),
-            azimuth.value - 90,
-            azimuth.value - 90 + deltaAngle(azimuth.value, bearing.bearing.value),
+            azimuth - 90,
+            azimuth - 90 + deltaAngle(azimuth, bearing.bearing),
             ArcMode.Pie
         )
 
@@ -299,8 +298,8 @@ class RadarCompassView : BaseCompassView, IMapView {
                 centerPixel.y - size / 2f,
                 size,
                 size,
-                azimuth.value - 90,
-                azimuth.value - 90 + deltaAngle(azimuth.value, bearing.bearing.value),
+                azimuth - 90,
+                azimuth - 90 + deltaAngle(azimuth, bearing.bearing),
                 ArcMode.Pie
             )
         }
@@ -382,7 +381,7 @@ class RadarCompassView : BaseCompassView, IMapView {
     }
 
     override var metersPerPixel: Float
-        get() = maxDistanceMeters.distance / (compassSize / 2f)
+        get() = maxDistanceMeters.value / (compassSize / 2f)
         set(_) {
             // Do nothing yet
         }
@@ -395,9 +394,9 @@ class RadarCompassView : BaseCompassView, IMapView {
             compassCenter = value
         }
     override var mapAzimuth: Float
-        get() = azimuth.value
+        get() = azimuth
         set(value) {
-            azimuth = Bearing(value)
+            azimuth = value
         }
 
     override val mapRotation: Float = 0f

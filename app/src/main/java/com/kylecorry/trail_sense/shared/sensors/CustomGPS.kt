@@ -20,6 +20,7 @@ import com.kylecorry.sol.units.TimeUnits
 import com.kylecorry.trail_sense.shared.AltitudeCorrection
 import com.kylecorry.trail_sense.shared.ApproximateCoordinate
 import com.kylecorry.trail_sense.shared.UserPreferences
+import com.kylecorry.trail_sense.shared.debugging.isDebug
 import com.kylecorry.trail_sense.shared.preferences.PreferencesSubsystem
 import com.kylecorry.trail_sense.shared.sensors.gps.FusedGPS
 import com.kylecorry.trail_sense.shared.sensors.speedometer.SpeedEstimator
@@ -72,7 +73,7 @@ class CustomGPS(
     override val altitude: Float
         get() = _altitude
     override val bearing: Bearing?
-        get() = _bearing
+        get() = _bearing?.let { Bearing.from(it) }
     override val bearingAccuracy: Float?
         get() = _bearingAccuracy
 
@@ -103,7 +104,7 @@ class CustomGPS(
     }
 
     private val geoidTimer = CoroutineTimer {
-        geoidOffset = AltitudeCorrection.getGeoid(context, location)
+        geoidOffset = AltitudeCorrection.getGeoid(location)
     }
 
     private var _altitude = 0f
@@ -112,16 +113,18 @@ class CustomGPS(
     private var _horizontalAccuracy: Float? = null
     private var _verticalAccuracy: Float? = null
     private var _satellites: Int? = null
-    private var _speed: Speed = Speed(0f, DistanceUnits.Meters, TimeUnits.Seconds)
+    private var _speed: Speed = Speed.from(0f, DistanceUnits.Meters, TimeUnits.Seconds)
     private var _location = Coordinate.zero
     private var _mslAltitude: Float? = null
     private var _isTimedOut = false
     private var mslOffset = 0f
     private var geoidOffset = 0f
     private var _rawBearing: Float? = null
-    private var _bearing: Bearing? = null
+    private var _bearing: Float? = null
     private var _bearingAccuracy: Float? = null
     private var _speedAccuracy: Float? = null
+
+    private var hadValidReading = false
 
     private val locationHistory = RingBuffer<Pair<ApproximateCoordinate, Instant>>(10)
 
@@ -152,7 +155,7 @@ class CustomGPS(
         _altitude = baseGPS.altitude - getGeoidOffset(_location)
 
         _rawBearing = baseGPS.rawBearing
-        _bearing = baseGPS.bearing
+        _bearing = baseGPS.bearing?.value
         _bearingAccuracy = baseGPS.bearingAccuracy
         _speedAccuracy = baseGPS.speedAccuracy
 
@@ -203,7 +206,7 @@ class CustomGPS(
         }
 
         // This is not ideal, but an offset is needed (and this service caches it)
-        geoidOffset = runBlocking { AltitudeCorrection.getGeoid(context, location) }
+        geoidOffset = runBlocking { AltitudeCorrection.getGeoid(location) }
         return geoidOffset
     }
 
@@ -218,7 +221,8 @@ class CustomGPS(
             cache.getDouble(LAST_LONGITUDE) ?: 0.0
         )
         _altitude = cache.getFloat(LAST_ALTITUDE) ?: 0f
-        _speed = Speed(cache.getFloat(LAST_SPEED) ?: 0f, DistanceUnits.Meters, TimeUnits.Seconds)
+        _speed =
+            Speed.from(cache.getFloat(LAST_SPEED) ?: 0f, DistanceUnits.Meters, TimeUnits.Seconds)
         _time = Instant.ofEpochMilli(cache.getLong(LAST_UPDATE) ?: 0L)
     }
 
@@ -226,6 +230,12 @@ class CustomGPS(
     override fun startImpl() {
         if (!GPS.isAvailable(context)) {
             return
+        }
+
+        // If this is being restarted, reload the value from cache if there's a newer reading there
+        if (isDebug() && hadValidReading && cacheHasNewerReading()) {
+            updateFromCache()
+            notifyListeners()
         }
 
         baseGPS.start(this::onLocationUpdate)
@@ -270,6 +280,7 @@ class CustomGPS(
         updateFromBase()
 
         if (shouldNotify && location != Coordinate.zero) {
+            hadValidReading = true
             notifyListeners()
         }
 

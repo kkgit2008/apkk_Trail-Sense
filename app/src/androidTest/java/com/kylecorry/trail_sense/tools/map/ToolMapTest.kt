@@ -54,7 +54,8 @@ class ToolMapTest : ToolTestBase(Tools.MAP) {
 
         click("Navigate")
         hasText(Regex(".*-?\\d+\\.\\d+°,\\s+-?\\d+\\.\\d+°.*"))
-        click(R.id.cancel_navigation_btn)
+        click(toolbarButton(R.id.navigation_sheet_title, Side.Right))
+        click("Yes")
 
         longClick(R.id.map)
         click("Distance")
@@ -86,6 +87,7 @@ class ToolMapTest : ToolTestBase(Tools.MAP) {
         scrollUntil { hasText("Hillshade") }
         scrollUntil { hasText("Photo Maps") }
         scrollUntil { hasText("Contours") }
+        scrollUntil { hasText("Cell towers") }
         scrollUntil { hasText("Paths") }
         scrollUntil { hasText("Beacons") }
         scrollUntil { hasText("Navigation") }

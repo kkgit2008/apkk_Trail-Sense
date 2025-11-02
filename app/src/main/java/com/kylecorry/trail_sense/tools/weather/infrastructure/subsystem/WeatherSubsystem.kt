@@ -5,8 +5,8 @@ import android.content.Context
 import com.kylecorry.andromeda.core.cache.MemoryCachedValue
 import com.kylecorry.andromeda.core.coroutines.onDefault
 import com.kylecorry.andromeda.core.coroutines.onIO
-import com.kylecorry.andromeda.core.topics.ITopic
-import com.kylecorry.andromeda.core.topics.Topic
+import com.kylecorry.andromeda.core.subscriptions.ISubscription
+import com.kylecorry.andromeda.core.subscriptions.Subscription
 import com.kylecorry.andromeda.sense.Sensors
 import com.kylecorry.sol.math.Range
 import com.kylecorry.sol.science.meteorology.KoppenGeigerClimateClassification
@@ -14,6 +14,7 @@ import com.kylecorry.sol.science.meteorology.Meteorology
 import com.kylecorry.sol.science.meteorology.clouds.CloudGenus
 import com.kylecorry.sol.units.Coordinate
 import com.kylecorry.sol.units.Distance
+import com.kylecorry.sol.units.Pressure
 import com.kylecorry.sol.units.Reading
 import com.kylecorry.sol.units.Temperature
 import com.kylecorry.trail_sense.R
@@ -24,7 +25,6 @@ import com.kylecorry.trail_sense.shared.preferences.PreferencesSubsystem
 import com.kylecorry.trail_sense.shared.sensors.LocationSubsystem
 import com.kylecorry.trail_sense.tools.climate.infrastructure.ClimateSubsystem
 import com.kylecorry.trail_sense.tools.climate.infrastructure.precipitation.HistoricMonthlyPrecipitationRepo
-import com.kylecorry.trail_sense.tools.climate.infrastructure.temperatures.HistoricTemperatureRepo
 import com.kylecorry.trail_sense.tools.clouds.infrastructure.persistence.CloudRepo
 import com.kylecorry.trail_sense.tools.tools.infrastructure.Tools
 import com.kylecorry.trail_sense.tools.weather.WeatherToolRegistration
@@ -32,6 +32,7 @@ import com.kylecorry.trail_sense.tools.weather.domain.CurrentWeather
 import com.kylecorry.trail_sense.tools.weather.domain.RawWeatherObservation
 import com.kylecorry.trail_sense.tools.weather.domain.WeatherObservation
 import com.kylecorry.trail_sense.tools.weather.domain.forecasting.IWeatherForecaster
+import com.kylecorry.trail_sense.tools.weather.domain.forecasting.MonteCarloPressureForecaster
 import com.kylecorry.trail_sense.tools.weather.domain.forecasting.WeatherForecaster
 import com.kylecorry.trail_sense.tools.weather.domain.forecasting.temperatures.CalibratedTemperatureService
 import com.kylecorry.trail_sense.tools.weather.domain.forecasting.temperatures.HistoricTemperatureService
@@ -64,8 +65,8 @@ class WeatherSubsystem private constructor(private val context: Context) : IWeat
     private var isValid = false
     private var updateWeatherMutex = Mutex()
 
-    private val _weatherChanged = Topic()
-    override val weatherChanged: ITopic = _weatherChanged
+    private val _weatherChanged = Subscription()
+    override val weatherChanged: ISubscription = _weatherChanged
 
     private val invalidationPrefKeys = listOf(
         R.string.pref_use_sea_level_pressure,
@@ -79,16 +80,6 @@ class WeatherSubsystem private constructor(private val context: Context) : IWeat
         R.string.pref_weather_forecast_source,
         R.string.pref_barometer_offset,
         R.string.pref_pressure_units
-    ).map { context.getString(it) }
-
-    private val weatherMonitorStatePrefKeys = listOf(
-        R.string.pref_monitor_weather,
-        R.string.pref_low_power_mode_weather,
-        R.string.pref_low_power_mode
-    ).map { context.getString(it) }
-
-    private val weatherMonitorFrequencyPrefKeys = listOf(
-        R.string.pref_weather_update_frequency
     ).map { context.getString(it) }
 
     init {
@@ -110,7 +101,6 @@ class WeatherSubsystem private constructor(private val context: Context) : IWeat
 
         weatherChanged.subscribe {
             Tools.broadcast(WeatherToolRegistration.BROADCAST_WEATHER_PREDICTION_CHANGED)
-            true
         }
     }
 
@@ -136,7 +126,7 @@ class WeatherSubsystem private constructor(private val context: Context) : IWeat
             WeatherObservation(
                 reading?.value?.id ?: 0L,
                 it.time,
-                it.value.copy(pressure = it.value.pressure + offset),
+                Pressure.from(it.value.value + offset, it.value.units),
                 Temperature.celsius(reading?.value?.temperature ?: 0f),
                 reading?.value?.humidity
             )
@@ -244,7 +234,6 @@ class WeatherSubsystem private constructor(private val context: Context) : IWeat
     override suspend fun getMonthlyPrecipitation(location: Coordinate?): Map<Month, Distance> {
         val resolved = resolveLocation(location, null)
         return HistoricMonthlyPrecipitationRepo.getMonthlyPrecipitation(
-            context,
             resolved.first
         )
     }
@@ -260,7 +249,7 @@ class WeatherSubsystem private constructor(private val context: Context) : IWeat
 
         val monthlyAverageTemperatures = temperatures
             .filter { it.first.dayOfMonth == 15 }
-            .associate { it.first.month to Temperature.celsius((it.second.start.celsius().temperature + it.second.end.celsius().temperature) / 2) }
+            .associate { it.first.month to Temperature.celsius((it.second.start.celsius().value + it.second.end.celsius().value) / 2) }
 
         return Meteorology.getKoppenGeigerClimateClassification(
             monthlyAverageTemperatures,
@@ -328,6 +317,33 @@ class WeatherSubsystem private constructor(private val context: Context) : IWeat
 
     override suspend fun getCloudHistory(): List<Reading<CloudGenus?>> = onIO {
         cloudRepo.getAll().sortedBy { it.time }.map { Reading(it.value.genus, it.time) }
+    }
+
+
+    // TODO: Extract this to Sol (new forecaster)
+    suspend fun getPressureForecast(): List<Reading<Pressure>> = onDefault {
+        val forecaster = MonteCarloPressureForecaster()
+        val history = getHistory().map { it.pressureReading() }.takeLast(50)
+        // TODO: Determine if the pressure history is reliable - sum of squared errors between raw and smoothed?
+        val isPressureTrusted = prefs.weather.pressureSmoothing < 0.15f
+        val derivativeSmoothing = if (isPressureTrusted) {
+            0f
+        } else {
+            0.1f
+        }
+        val error = if (isPressureTrusted) {
+            0.1f
+        } else {
+            0.2f
+        }
+        forecaster.getPressureForecast(
+            history,
+            maxErrorHpa = 8f,
+            velocitySmoothing = derivativeSmoothing,
+            accelerationSmoothing = derivativeSmoothing,
+            velocityError = error,
+            accelerationError = error
+        )
     }
 
     private suspend fun populateCache(): CurrentWeather {

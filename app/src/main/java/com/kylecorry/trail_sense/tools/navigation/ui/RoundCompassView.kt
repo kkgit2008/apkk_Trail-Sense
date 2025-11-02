@@ -140,7 +140,7 @@ class RoundCompassView : BaseCompassView {
         clear()
         drawAzimuth()
         push()
-        rotate(-azimuth.value)
+        rotate(-azimuth)
         drawCompass()
         drawCompassLayers()
         pop()
@@ -156,7 +156,7 @@ class RoundCompassView : BaseCompassView {
         }
         opacity((255 * reference.opacity).toInt())
         push()
-        rotate(reference.bearing.value)
+        rotate(reference.bearing)
         val bitmap = getBitmap(reference.drawableId, sizeDp)
         imageMode(ImageMode.Corner)
         push()
@@ -179,8 +179,8 @@ class RoundCompassView : BaseCompassView {
             iconSize.toFloat() + dp2,
             compassSize.toFloat(),
             compassSize.toFloat(),
-            azimuth.value - 90,
-            azimuth.value - 90 + deltaAngle(azimuth.value, bearing.bearing.value),
+            azimuth - 90,
+            azimuth - 90 + deltaAngle(azimuth, bearing.bearing),
             ArcMode.Pie
         )
         opacity(255)
